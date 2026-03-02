@@ -240,7 +240,34 @@ Before flagging a board as "ready for review," confirm all of the following:
 - [ ] DRC passes with 0 errors, 0 unconnected after routing + zone fill
 - [ ] 3D clearances noted in Stage 1 spec are respected
 - [ ] Gerbers + drill file generated and visually spot-checked
+- [ ] PDF exports generated for all copper + silkscreen layers
 - [ ] Board README updated with final status
+
+***
+
+### Stage 8: PDF Export for Review
+
+Generate per-layer PDF exports so contributors can review the board without installing KiCad.
+
+```bash
+kicad-cli pcb export pdf \
+  -l "F.Cu,B.Cu,F.SilkS,B.SilkS,F.Mask,B.Mask,Edge.Cuts" \
+  --drill-shape-opt 2 \
+  -o ./module_placed.pdf module_placed.kicad_pcb
+```
+
+This produces a multi-page PDF with one page per layer. The `--drill-shape-opt 2` flag renders drill holes at their actual size for accurate visual inspection.
+
+For 4-layer boards, include inner layers:
+
+```bash
+kicad-cli pcb export pdf \
+  -l "F.Cu,In1.Cu,In2.Cu,B.Cu,F.SilkS,B.SilkS,F.Mask,B.Mask,Edge.Cuts" \
+  --drill-shape-opt 2 \
+  -o ./module_placed.pdf module_placed.kicad_pcb
+```
+
+Place the PDF in the board's directory alongside the Gerbers (e.g. `hardware/pcbs/key/mixtee-key-pcb.pdf`). Commit it to the repo so reviewers can open it directly on GitHub.
 
 ***
 

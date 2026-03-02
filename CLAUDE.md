@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+Important: do NOT cd into the current doc when calling commands.
+
 ## Project Overview
 
 MIXTEE is an open-source 16-input / 8-output digital mixer built around the Teensy 4.1. This is a **hardware-first project** currently in the design/documentation phase — no firmware code exists yet. The `firmware/` directory is a placeholder.
