@@ -43,12 +43,14 @@ mixtee/
 │   ├── mixtee-layout.svg    ← panel layout drawing (editable)
 │   ├── mixtee-layout.jpg    ← panel layout render
 │   ├── mixtee-layout.afdesign  ← Affinity Designer source
-│   ├── kicad/               ← KiCad 9 project files
-│   │   ├── mixtee-main/          ← Main Board (4-layer, hierarchical)
-│   │   ├── mixtee-input-mother/  ← Input Mother Board (4-layer)
-│   │   ├── mixtee-daughter-output/ ← Daughter/Output Board (2-layer)
-│   │   ├── mixtee-key/           ← Key PCB (2-layer)
-│   │   └── lib/                  ← Custom symbols, footprints, 3D models
+│   ├── lib/                    ← shared KiCad footprint library
+│   ├── pcbs/                   ← KiCad 9 projects (README + design files per board)
+│   │   ├── daughter-output/         ← Daughter/Output Board (2-layer)
+│   │   ├── input-mother/            ← Input Mother Board (4-layer)
+│   │   ├── io/                      ← IO Board (2-layer)
+│   │   ├── key/                     ← Key PCB (2-layer)
+│   │   ├── main/                    ← Main Board (not started)
+│   │   └── power/                   ← Power Board (off-the-shelf)
 │   └── reference/      ← reference materials
 └── firmware/           ← Teensy 4.1 firmware (coming in Phase 1)
 ```
