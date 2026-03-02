@@ -98,12 +98,12 @@ First multi-layer board in this project. FreeRouting has known bugs with 4-layer
 Results are non-deterministic: same DSN produces 2–63 unrouted depending on which errors are hit. Best run achieved 4 unrouted. The remaining 5 DRC unconnected items are minor track gaps that copper plane fills resolve (3× V33_A, 1× GND) or can be hand-touched in KiCad (1× SCL).
 
 ### Files produced
-- `hardware/kicad/mixtee-input-mother/gen_pcb.py` — PCB generator (~1250 lines, 71 components, 65 nets)
-- `hardware/kicad/mixtee-input-mother/mixtee-input-mother.kicad_pcb` — routed 4-layer PCB
-- `hardware/kicad/mixtee-input-mother/mixtee-input-mother.kicad_pro` — project file
-- `hardware/kicad/mixtee-input-mother/mixtee-input-mother.dsn` — Specctra DSN with net classes
-- `hardware/kicad/mixtee-input-mother/mixtee-input-mother.ses` — FreeRouting session
-- `hardware/kicad/mixtee-input-mother/gerbers/` — 11 Gerber layers + drill + job file (14 files)
+- `hardware/pcbs/input-mother/gen_pcb.py` — PCB generator (~1250 lines, 71 components, 65 nets)
+- `hardware/pcbs/input-mother/mixtee-input-mother.kicad_pcb` — routed 4-layer PCB
+- `hardware/pcbs/input-mother/mixtee-input-mother.kicad_pro` — project file
+- `hardware/pcbs/input-mother/mixtee-input-mother.dsn` — Specctra DSN with net classes
+- `hardware/pcbs/input-mother/mixtee-input-mother.ses` — FreeRouting session
+- `hardware/pcbs/input-mother/gerbers/` — 11 Gerber layers + drill + job file (14 files)
 
 ### Next steps
 - Hand-fix SCL track gap in KiCad (0.42mm gap near U1 pad 28)

@@ -39,9 +39,9 @@ Scrapped the manual trace routing from gen_pcb.py (which had 2 shorting errors a
 | **Unconnected** | **0** | |
 
 ### Files produced
-- `hardware/kicad/mixtee-daughter-output/mixtee-daughter-output.dsn` — Specctra DSN with net classes
-- `hardware/kicad/mixtee-daughter-output/mixtee-daughter-output.ses` — FreeRouting session
-- `hardware/kicad/mixtee-daughter-output/gerbers/` — 7 Gerber + drill + job (9 files)
+- `hardware/pcbs/daughter-output/mixtee-daughter-output.dsn` — Specctra DSN with net classes
+- `hardware/pcbs/daughter-output/mixtee-daughter-output.ses` — FreeRouting session
+- `hardware/pcbs/daughter-output/gerbers/` — 7 Gerber + drill + job (9 files)
 
 ---
 

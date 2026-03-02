@@ -1,7 +1,7 @@
 ## 2026-03-01 — Daughter/Output Board Trace Routing
 
 ### What was done
-Added programmatic trace routing to `hardware/kicad/gen_daughter_output.py`. The board has 6 nets (AIN1–4, +5VA, GND) across 10 components on an 80×20mm 2-layer PCB.
+Added programmatic trace routing to `hardware/pcbs/daughter-output/gen_pcb.py`. The board has 6 nets (AIN1–4, +5VA, GND) across 10 components on an 80×20mm 2-layer PCB.
 
 ### Routing strategy
 - **AIN1**: All F.Cu — L-route from J1 to J2.T, vertical down to D1.K

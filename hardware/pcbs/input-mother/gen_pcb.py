@@ -1412,7 +1412,7 @@ if __name__ == "__main__":
     with open(fp_lib_path, "w") as f:
         f.write("""(fp_lib_table
   (version 7)
-  (lib (name "mixtee-footprints") (type "KiCad") (uri "${KIPRJMOD}/../lib/mixtee-footprints.pretty") (options "") (descr ""))
+  (lib (name "mixtee-footprints") (type "KiCad") (uri "${KIPRJMOD}/../../lib/mixtee-footprints.pretty") (options "") (descr ""))
 )
 """)
     print(f"Footprint lib table written to: {fp_lib_path}")

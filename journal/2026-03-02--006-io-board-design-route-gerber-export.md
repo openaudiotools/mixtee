@@ -70,12 +70,12 @@ FreeRouting with 0.21mm clearance for all classes: 2 unrouted USB connections. S
 All errors are cosmetic/marginal — 0 shorts, 0 USB clearance violations, all connections routed.
 
 ### Files produced
-- `hardware/kicad/mixtee-io-board/gen_pcb.py` — PCB generator (33 components, 37 nets)
-- `hardware/kicad/mixtee-io-board/mixtee-io-board.kicad_pcb` — routed PCB
-- `hardware/kicad/mixtee-io-board/mixtee-io-board.kicad_pro` — project with USB_Diff net assignments
-- `hardware/kicad/mixtee-io-board/mixtee-io-board.dsn` — Specctra DSN
-- `hardware/kicad/mixtee-io-board/mixtee-io-board.ses` — FreeRouting session
-- `hardware/kicad/mixtee-io-board/gerbers/` — 29 Gerber layers + drill file
+- `hardware/pcbs/io/gen_pcb.py` — PCB generator (33 components, 37 nets)
+- `hardware/pcbs/io/mixtee-io-board.kicad_pcb` — routed PCB
+- `hardware/pcbs/io/mixtee-io-board.kicad_pro` — project with USB_Diff net assignments
+- `hardware/pcbs/io/mixtee-io-board.dsn` — Specctra DSN
+- `hardware/pcbs/io/mixtee-io-board.ses` — FreeRouting session
+- `hardware/pcbs/io/gerbers/` — 29 Gerber layers + drill file
 
 ### Next steps
 - Verify FE1.1s pinout against actual datasheet (marked NEEDS VERIFICATION in gen_pcb.py)

@@ -1,4 +1,4 @@
-(pcb "D:/projects/mixtee/hardware/kicad/mixtee-key-pcb/mixtee-key-pcb.dsn"
+(pcb "D:/projects/mixtee/hardware/pcbs/key/mixtee-key-pcb.dsn"
   (parser
     (string_quote ")
     (space_in_quoted_tokens on)

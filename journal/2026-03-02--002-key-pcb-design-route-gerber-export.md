@@ -62,12 +62,12 @@ First FreeRouting run with 0.2mm DSN clearance produced one trace at 0.198mm fro
 | silk_edge_clearance | 1 | Edge silk proximity |
 
 ### Files produced
-- `hardware/kicad/mixtee-key-pcb/gen_pcb.py` — PCB generator script
-- `hardware/kicad/mixtee-key-pcb/mixtee-key-pcb.kicad_pcb` — routed PCB
-- `hardware/kicad/mixtee-key-pcb/mixtee-key-pcb.kicad_pro` — project file
-- `hardware/kicad/mixtee-key-pcb/mixtee-key-pcb.dsn` — Specctra DSN
-- `hardware/kicad/mixtee-key-pcb/mixtee-key-pcb.ses` — FreeRouting session
-- `hardware/kicad/mixtee-key-pcb/gerbers/` — 29 Gerber layers + drill file
+- `hardware/pcbs/key/gen_pcb.py` — PCB generator script
+- `hardware/pcbs/key/mixtee-key-pcb.kicad_pcb` — routed PCB
+- `hardware/pcbs/key/mixtee-key-pcb.kicad_pro` — project file
+- `hardware/pcbs/key/mixtee-key-pcb.dsn` — Specctra DSN
+- `hardware/pcbs/key/mixtee-key-pcb.ses` — FreeRouting session
+- `hardware/pcbs/key/gerbers/` — 29 Gerber layers + drill file
 
 ### Next steps
 - Add NPTH mounting holes back to CHOC socket footprints (omitted for routing)
