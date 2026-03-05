@@ -18,7 +18,7 @@ For detailed per-board documentation, see each board's directory under `hardware
 
 | ID | Name | Unique design | Instances | Layers | Active components | Details |
 |----|------|--------------|-----------|--------|-------------------|---------|
-| M | Main Board | Yes | 1 | 4 | Teensy, power mgmt, TS5A3159 mute, 74LVC1G00 soft-latch, ADP7118 LDO | [README](../hardware/pcbs/main/README.md) |
+| M | Main Board | Yes | 1 | 4 | Teensy, XMOS XU216 USB audio bridge, power mgmt, TS5A3159 mute, 74LVC1G00 soft-latch, ADP7118 LDO | [README](../hardware/pcbs/main/README.md) |
 | IO | IO Board | Yes | 1 | 2 | FE1.1s hub, 6N138 MIDI, 2× TPS2051, RJ45 MagJack | [README](../hardware/pcbs/io/README.md) |
 | P | Power Module | Off-the-shelf | 1 | — | STUSB4500 USB PD breakout (purchased) | [README](../hardware/pcbs/power/README.md) |
 | 1-top | Input Mother (TDM1) | Shared w/ 2-top | 1 | 4 | ADP7118 LDO, 2× AK4619VN, 8× input analog, 4× output analog | [README](../hardware/pcbs/input-mother/README.md) |
@@ -64,7 +64,7 @@ Looking at the back panel (260 mm wide × 50 mm tall):
               ← outputs                    inputs →
 ```
 
-The PWR USB-C receptacle mounts on the **Power Board** — a small dedicated PCB on the far right of the back panel. Labeled "PWR" (power only, 5V/5A PD). A 2-pin cable carries 5V + GND from the Power Board to the Main Board. An **off-the-shelf screw-collar momentary push button** ("POWER") mounts next to the PWR USB-C on the back panel, wired to the Main Board soft-latch circuit. The **PC USB-C** (data only, USB Audio + MIDI composite) is on the **top panel** (left zone, Main Board mount). The three mother+daughter pairs tile across the remaining back panel width.
+The PWR USB-C receptacle mounts on the **Power Board** — a small dedicated PCB on the far right of the back panel. Labeled "PWR" (power only, 5V/5A PD). A 2-pin cable carries 5V + GND from the Power Board to the Main Board. An **off-the-shelf screw-collar momentary push button** ("POWER") mounts next to the PWR USB-C on the back panel, wired to the Main Board soft-latch circuit. The **PC USB-C** (data only, 24-in/8-out USB Audio Class 2 + MIDI composite via XMOS XU216) is on the **top panel** (left zone, Main Board mount). The three mother+daughter pairs tile across the remaining back panel width.
 
 ------
 

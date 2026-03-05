@@ -36,6 +36,11 @@
   - USB host capability for MIDI controllers
   - Extensive GPIO for encoders/buttons/display
   - PJRC Audio Library ecosystem (mixer objects, effects, routing)
+- **XMOS XU216** USB Audio Class 2 bridge
+  - Passive TDM tap: captures all 24 channels (16 inputs + 8 bus outputs) from both SAI buses
+  - Presents as 24-in / 8-out USB audio device + USB MIDI (composite) to PC
+  - MIDI forwarded to/from Teensy via SPI0 (pins 10–13)
+  - See [usb-audio.md](usb-audio.md) for full architecture
 
 ------
 
@@ -58,21 +63,23 @@
   - Labeled "PWR" on back panel (right side)
 - **PC — USB-C (data only) — on Main Board (top panel):**
   - PCB-mount USB-C receptacle on Main Board
-  - D+/D- routed to Teensy 4.1 native USB device port
+  - D+/D- routed to **XMOS XU216** USB audio bridge (not Teensy native USB)
   - VBUS not used for system power (only for USB signaling / pull-ups as needed)
-  - Carries USB Audio (2-in/2-out UAC1) + USB MIDI (composite device)
+  - Carries USB Audio Class 2 (24-in/8-out, 24-bit 48 kHz) + USB MIDI (composite device via XMOS)
   - Labeled "PC" on top panel (left zone, near SD card slot)
   - Ground connected to system GND through ferrite bead to reduce computer-injected noise
+  - See [usb-audio.md](usb-audio.md) for full XMOS architecture
 
 ### Power Budget (5V rail)
 
 - **USB host ports:** 2× 500 mA = 1.0 A
 - **NeoPixels (16 keys):** ~320 mA typical (at 30% cap), 960 mA worst-case (uncapped)
-- **TFT display (4.3" RA8875):** ~250-350 mA (backlight dependent)
+- **ESP32-S3 display module:** Self-powered from 5V_DIG (~250-350 mA including backlight)
 - **Teensy + logic:** ~200 mA
 - **Audio analog stages:** ~200-300 mA
-- **Worst-case total:** ~2.81 A (with uncapped NeoPixels)
-- **With 20% reserve:** ~3.37 A
+- **XMOS XU216 (USB audio bridge):** ~200 mA (core 1.0V LDO + I/O 3.3V)
+- **Worst-case total:** ~3.01 A (with uncapped NeoPixels)
+- **With 20% reserve:** ~3.61 A
 - **Supply target:** 5V @ 5A via USB PD (headroom for uncapped NeoPixels + builder modifications)
 
 ### Power Distribution
@@ -148,12 +155,14 @@
 | Teensy 4.1            | 1        | ARM Cortex-M7, USB host, TDM audio, SD slot    |
 | AK4619VN              | 4        | 4-in/4-out codec; U1-U2 full, U3-U4 ADC only  |
 | PSRAM (8 MB, QSPI)   | 1        | IPS6404LSQ or APS6404L; solder to Teensy bottom pads |
+| XMOS XU216-256-TQ128-C20 | 1    | USB Audio Class 2 bridge; 24-in/8-out multichannel; on Main Board; see [usb-audio.md](usb-audio.md) |
+| W25Q32 QSPI flash (4 MB) | 1    | XMOS firmware storage; on Main Board |
 
 ### UI Components
 
 | Part                          | Quantity | Notes                                        |
 | ----------------------------- | -------- | -------------------------------------------- |
-| 4.3" 480×272 TFT w/ RA8875   | 1        | SPI, hardware drawing engine, PJRC RA8875_t4 |
+| ESP32-S3 integrated display module | 1   | 4.3" LCD (e.g., Waveshare ESP32-S3-Touch-LCD-4.3 800×480 or Elecrow CrowPanel 480×272); UART link to Teensy (TX/RX, 2 wires); runs LVGL for all rendering |
 | Rotary encoder with push      | 3        | Quadrature, interrupt-capable pins; NavX + NavY + Edit |
 | Custom key PCB                | 1–2     | CHOC hotswap sockets + WS2812B-2020 + MCP23017 + 100nF caps; 4×4 grid |
 | Kailh CHOC hotswap sockets    | 16       | Soldered to custom PCB                        |
@@ -167,7 +176,7 @@
 | ------------------------------- | -------- | --------------------------------- |
 | TCA9548A I2C mux                | 1        | I2C bus switch on main board; isolates codec boards; address 0x70 |
 | STUSB4500 breakout module       | 1        | Off-the-shelf (SparkFun PD Board or equiv.); PWR USB-C input; back panel |
-| USB-C receptacle (PCB-mount)    | 1        | PC port — data only (audio+MIDI); on Main Board (top panel) |
+| USB-C receptacle (PCB-mount PC) | 1        | PC port — data only; routed to XMOS XU216 (24ch audio+MIDI); on Main Board (top panel) |
 | FE1.1s USB 2.0 hub IC           | 1        | On IO Board; upstream via FFC, 2 downstream to USB-A |
 | 12 MHz crystal                  | 1        | FE1.1s clock source on IO Board, 15 pF load caps |
 | 6N138 optocoupler               | 1        | MIDI IN galvanic isolation on IO Board, 31.25 kbaud |
@@ -199,6 +208,10 @@
 | Part                           | Quantity | Notes                                    |
 | ------------------------------ | -------- | ---------------------------------------- |
 | ADP7118 LDO                    | 3        | 5V → 3.3V_A ultra-low-noise analog rail; 1 per Input Mother Board (2) + 1 on Main Board (virtual ground; 5V_A also powers HP amp breakout via short wire) |
+| 1.0V LDO (AP2112K-1.0 or equiv.) | 1      | XMOS XU216 core supply; on Main Board |
+| 24 MHz crystal                 | 1        | XMOS core clock; on Main Board |
+| 24.576 MHz crystal             | 1        | XMOS audio PLL reference; on Main Board |
+| USBLC6-2 ESD protection        | 1        | PC USB-C ESD protection; on Main Board |
 | TPS22965 load switch             | 1       | Soft-start / inrush limiting, 5A continuous |
 | 10 mΩ shunt resistor           | 1        | Current measurement test point           |
 
@@ -251,9 +264,9 @@
 **Top panel (260 × 84.6 mm — all controls and connectivity):**
 
 Left zone (Main Board):
-- PC USB-C (data only — USB Audio + MIDI)
+- PC USB-C (data only — 24ch USB Audio Class 2 + MIDI via XMOS XU216)
 - Full-size SD card slot (left of display, vertically aligned with bottom edge of screen, slot opens upward)
-- 1× TFT display (4.3" RA8875, ~93×56 mm visible area)
+- 1× ESP32-S3 display module (4.3" integrated LCD; replaces bare TFT + RA8875 controller; physical dimensions depend on chosen module)
 - 3× rotary encoders (NavX + NavY + Edit): horizontal row below display
 
 Center:

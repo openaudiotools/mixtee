@@ -6,6 +6,8 @@
 
 ## Overview
 
+> **Display rendering runs on an ESP32-S3 integrated display module using LVGL, not on the Teensy.** The Teensy sends meter data (24 peak/RMS float pairs at 30 Hz) and parameter state changes over UART. The ESP32-S3 handles all screen rendering independently. The navigation model and UI hierarchy described below are unchanged — only the rendering target has moved off the Teensy.
+
 The MIXTEE display UI is built on a modular, hierarchical framework designed for two goals: fast access to the most-used mixing parameters (gain, level, mute) with minimal button presses, and extensibility so that community contributors can add new processing modules without reworking the navigation engine.
 
 The signal path is hardcoded in the DSP audio graph (fixed at compile time). UI modules provide windows into different points of that fixed graph — rearranging or adding modules on screen does not affect DSP processing order.

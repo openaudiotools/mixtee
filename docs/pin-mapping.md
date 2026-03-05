@@ -51,16 +51,16 @@ BCLK = 48 kHz × 16 slots × 32 bits = **24.576 MHz**. MCLK = 256×fs = **12.288
 
 All four AK4619VN codecs share one I2C bus via a **TCA9548A I2C mux** (address 0x70) on the main board. The mux isolates each Input Mother Board onto its own channel (Ch 0 for U1/U2, Ch 1 for U3/U4), resolving the AK4619VN 2-address limitation. A **MCP23017 I2C GPIO expander** (address 0x20) on the Key PCB handles the 4×4 key scan matrix over the same bus. SDA and SCL routed on both FFC cables and the Key PCB cable. External pull-ups: 4.7kΩ to 3.3V on the main board (upstream of mux). Each Input Mother Board has its own downstream pull-ups. See [AK4619VN Wiring](../hardware/pcbs/input-mother/ak4619-wiring.md) for addressing details.
 
-### SPI0 — RA8875 TFT Display
+### SPI0 — XMOS XU216 Control Bus (MIDI Forwarding)
 
-| Teensy Pin | Function | Card Label |
-|-----------|----------|------------|
-| **10** | CS | CS |
-| **11** | MOSI | MOSI |
-| **12** | MISO | MISO |
-| **13** | SCK | SCK |
+SPI0 pins (10, 11, 12, 13) connect to the XMOS XU216 USB audio bridge for MIDI message forwarding between Teensy and PC. USB MIDI arrives at the XMOS over USB; the Teensy exchanges MIDI data via SPI at ~1 kHz polling rate.
 
-Standard SPI0 bus. Display is the only SPI0 device — no shared bus contention.
+| Teensy Pin | Function | Card Label | Direction |
+|-----------|----------|------------|-----------|
+| **10** | SPI0 CS → XMOS | CS | Output (Teensy selects XMOS) |
+| **11** | SPI0 MOSI → XMOS | MOSI | Output (MIDI TX: Teensy → PC) |
+| **12** | SPI0 MISO ← XMOS | MISO | Input (MIDI RX: PC → Teensy) |
+| **13** | SPI0 SCK | SCK | Output (SPI clock) |
 
 ### Serial3 — MIDI IN (6N138 Output)
 
@@ -71,7 +71,7 @@ Standard SPI0 bus. Display is the only SPI0 device — no shared bus contention.
 
 MIDI IN is receive-only at 31,250 baud. Pin 15 configured as Serial3 RX. **Routes via Main↔IO FFC pin 7 (MIDI_RX) to 6N138 optocoupler circuit on IO Board.**
 
-**Pin 14 note:** `Serial3.begin(31250)` claims both TX (pin 14) and RX (pin 15). Pin 14 is reclaimed as GPIO in firmware by overriding the IOMUX after Serial3 initialization. Used for RA8875 RESET (see GPIO section).
+**Pin 14 note:** `Serial3.begin(31250)` claims both TX (pin 14) and RX (pin 15). Pin 14 is reclaimed as GPIO in firmware by overriding the IOMUX after Serial3 initialization. Now spare (was RA8875 RESET, freed by ESP32-S3 display offload).
 
 ### Serial4 — MIDI OUT
 
@@ -134,10 +134,10 @@ Pins 49, 50, 52, 53, 54 (plus CS on 48 or 51) are consumed by the 8 MB PSRAM sol
 | 5 | SAI2 RX_DATA0 | — |
 | 7 | SAI1 TX_DATA0 | RX2 (Serial2 blocked) |
 | 8 | SAI1 RX_DATA0 | TX2 (Serial2 blocked) |
-| 10 | SPI0 CS | — |
-| 11 | SPI0 MOSI | CTX1 |
-| 12 | SPI0 MISO | — |
-| 13 | SPI0 SCK | (LED) |
+| 10 | SPI0 CS (XMOS control) | — |
+| 11 | SPI0 MOSI (XMOS control) | CTX1 |
+| 12 | SPI0 MISO (XMOS control) | — |
+| 13 | SPI0 SCK (XMOS control) | (LED) |
 | 15 | Serial3 RX (MIDI IN) | S/PDIF IN, RX4 |
 | 17 | Serial4 TX (MIDI OUT) | SDA1 |
 | 18 | Wire SDA | A4 |
@@ -149,15 +149,15 @@ Pins 49, 50, 52, 53, 54 (plus CS on 48 or 51) are consumed by the 8 MB PSRAM sol
 | 33 | SAI2 MCLK | Bottom pad |
 | 34 | SAI2 RX_DATA1 | Bottom pad |
 
-**Total edge pins consumed: 20** (plus bottom pads for USB Host, SDIO, QSPI)
+**Total edge pins consumed: 20** (plus bottom pads for USB Host, SDIO, QSPI). SPI0 pins 10–13 reassigned to XMOS XU216 control bus (MIDI forwarding).
 
 ------
 
 ## GPIO Budget
 
 Total Teensy 4.1 edge pins: **42** (pins 0–41)
-Consumed by peripherals: **20** (17 original + pin 32 SAI1_RX_DATA1 + pin 34 SAI2_RX_DATA1 + pin 17 MIDI OUT)
-Available for GPIO: **22**
+Consumed by peripherals: **22** (SAI1 ×6, SAI2 ×6, SPI0/XMOS ×4, I2C ×2, Serial1/ESP32 ×2, Serial3 RX ×1, Serial4 TX ×1)
+Available for GPIO: **20**
 
 ### GPIO Requirements
 
@@ -167,17 +167,16 @@ Available for GPIO: **22**
 | Encoder 2 (NavY) | **3** | A, B, push switch — vertical navigation |
 | Encoder 3 (Edit) | **3** | A, B, push switch — value editing |
 | NeoPixel data | **1** | Single data line to 16× WS2812B |
-| RA8875 INT | **1** | Active-low interrupt |
-| RA8875 RESET | **1** | Active-low reset (reclaimed from Serial3 TX) |
 | TS5A3159 mute control | **4** | 1 per output stereo pair |
 | Headphone detect | **1** | TRS jack switch input (from HP breakout area) |
 | Power button sense | **1** | Soft-latch button state (back panel button, wired to Main Board) |
 | KEEP_ALIVE | **1** | Hold soft-latch set during operation |
 | MCP23017 INT (optional) | **1** | Interrupt-driven key scan; can be omitted if polling |
 | MIDI OUT | **1** | Serial4 TX (pin 17) |
-| **Total** | **21** | |
+| XMOS return audio (candidate) | **(1)** | Pin 9 — SAI1_RX_DATA2 if IOMUX validates; may remain spare |
+| **Total** | **19** (+1 candidate) | |
 
-**Remaining spare: 2 pins** (pins 0 and 1 reserved for Serial1 debug)
+**Remaining spare: 1 pin** (pin 14, freed by ESP32-S3 display offload). Pin 9 is a candidate for XMOS return audio but requires iMXRT1062 IOMUX validation — if not usable as SAI1_RX_DATA2, it remains spare (2 spare total).
 
 ### Key Matrix via MCP23017
 
@@ -195,11 +194,11 @@ The 4×4 key matrix (16 keys) is handled entirely by a **MCP23017 I2C GPIO expan
 
 | Teensy Pin | Assignment | Direction | Notes |
 |-----------|-----------|-----------|-------|
-| **0** | *(spare — Serial1 RX)* | — | Reserved for debug UART |
-| **1** | *(spare — Serial1 TX)* | — | Reserved for debug UART |
+| **0** | Serial1 RX — ESP32-S3 display UART | Input | ESP32-S3 TX → Teensy (touch events) |
+| **1** | Serial1 TX — ESP32-S3 display UART | Output | Teensy → ESP32-S3 (meter data + param state) |
 | **6** | NeoPixel data out | Output | 300–500Ω series resistor; also has OUT1D (SAI1_DATA3) alternate — not used |
-| **9** | RA8875 display INT | Input | Active-low interrupt; also has OUT1C (SAI1_DATA2) alternate — not used |
-| **14** | RA8875 display RESET | Output | Active-low; IOMUX reclaimed from Serial3 TX after `Serial3.begin()` |
+| **9** | *(candidate: XMOS return audio)* | Input | SAI1_RX_DATA2 alternate — 8ch PC return; requires IOMUX validation; also OUT1C (SAI1_DATA2) |
+| **14** | *(spare — was RA8875 RESET)* | — | Freed by ESP32-S3 display offload; IOMUX reclaimed from Serial3 TX after `Serial3.begin()` |
 | **16** | Encoder 3 (Edit) — Push | Input (pull-up) | Also SCL1/RX4 alternate |
 | **17** | MIDI OUT (Serial4 TX) | Output | 31.25 kbaud MIDI output; also SDA1/TX4 alternate |
 | **22** | MCP23017 INT (optional) | Input (pull-up) | Key scan interrupt from Key PCB; also A8 |
@@ -232,7 +231,7 @@ Using certain pins as GPIO makes their alternate peripheral functions unavailabl
 | 24, 25 | Wire2 (I2C2), Serial6 | Not needed |
 | 28 | Serial7 RX | Not needed — MIDI uses Serial3 |
 | 29 | CAN3 RX | Not needed |
-| 0, 1 | SPI1 CS/MISO, CAN2 | Kept as Serial1 debug; SPI1/CAN2 not needed |
+| 0, 1 | SPI1 CS/MISO, CAN2 | Used as Serial1 for ESP32-S3 UART; SPI1/CAN2 not needed |
 
 **Note:** Pin 16 (Wire1 SCL / Serial4 RX) remains spare. Pin 17 is used as Serial4 TX for MIDI OUT — its Wire1 SDA alternate is unavailable.
 
@@ -248,7 +247,10 @@ Using certain pins as GPIO makes their alternate peripheral functions unavailabl
 6. **Pin 33 is a bottom pad** — SAI2 MCLK must be routed from Teensy underside to FFC connector
 7. **Pin 32 is now SAI1_RX_DATA1** — no longer available as GPIO (was Encoder 2 B, moved to pin 31)
 8. **Pin 34 is now SAI2_RX_DATA1** — no longer available as GPIO (was TS5A3159 mute Main, moved to pin 30)
-9. **Pins 6, 9 have SAI1 DATA2-3 alternates** — used as GPIO; safe because the Audio Library multi-data-line mode only uses DATA0 + DATA1
+9. **Pin 6 has SAI1 DATA3 alternate** — used as GPIO (NeoPixel); safe because the Audio Library multi-data-line mode only uses DATA0 + DATA1
+10. **Pin 9 has SAI1 DATA2 alternate** — candidate for XMOS return audio (SAI1_RX_DATA2). Requires IOMUX validation during breadboard phase. If not usable, remains spare GPIO.
+11. **XMOS XU216 passively taps TDM bus signals** — BCLK, LRCLK, and data lines on both SAI1 and SAI2 are shared with high-Z CMOS inputs on the XMOS. No bus contention — XMOS is receive-only on all audio data lines.
+12. **SPI0 (pins 10–13) reassigned to XMOS control bus** — no longer spare. Used for MIDI forwarding between Teensy and XMOS (USB MIDI composite device on PC USB-C).
 
 ------
 
@@ -272,3 +274,6 @@ Using certain pins as GPIO makes their alternate peripheral functions unavailabl
 - [ ] Validate FE1.1s upstream D+/D- connects to Teensy USB Host bottom pads (not USB Device)
 - [ ] Print 1:1 Teensy 4.1 footprint, verify bottom pad access for pins 33, 34, 35, 42–47
 - [ ] Verify external SD card socket SDIO routing from Teensy bottom pads 42–47
+- [ ] Validate pin 9 IOMUX for SAI1_RX_DATA2 (XMOS return audio) — check iMXRT1062 reference manual pad mux options
+- [ ] Verify SPI0 (pins 10–13) XMOS communication works at required polling rate (~1 kHz MIDI)
+- [ ] Verify XMOS passive TDM tap does not affect signal integrity on existing bus (measure eye diagrams if possible)

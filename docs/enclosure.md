@@ -33,7 +33,7 @@ Dimensions: **260 mm** wide × **84.6 mm** deep (front to back). Outputs moved t
 
 **PC — USB-C (data only):**
 - PCB-mount USB-C receptacle on Main Board, protrudes through top panel cutout
-- USB Audio 2-in/2-out + USB MIDI composite device
+- USB Audio Class 2 (24-in/8-out via XMOS XU216) + USB MIDI composite device
 - Labeled "PC" on top panel
 
 **SD card slot** (left of display, vertically aligned with bottom edge of screen):

@@ -64,22 +64,17 @@ See [`../io/connections.md`](../io/connections.md) for the full 12-pin FFC pinou
 
 ---
 
-## Display Header (8–10 pin)
+## ESP32-S3 Display Header (4 pin)
 
 | Pin | Signal |
 |-----|--------|
-| 1 | SPI MOSI |
-| 2 | SPI MISO |
-| 3 | SPI SCK |
-| 4 | CS |
-| 5 | INT |
-| 6 | RESET |
-| 7 | 3.3V |
-| 8 | GND |
-| 9 | (backlight PWM, optional) |
+| 1 | UART TX (Teensy → ESP32-S3) |
+| 2 | UART RX (ESP32-S3 → Teensy) |
+| 3 | 5V |
+| 4 | GND |
 
-**Connector:** Per RA8875 TFT module (2x5 or 1x10 pin header).
-**Cable:** ~20mm.
+**Connector:** 4-pin JST or pin header to ESP32-S3 integrated display module.
+**Cable:** ~20mm. SPI0 bus no longer needed — display rendering handled entirely by ESP32-S3 module running LVGL.
 
 ---
 
@@ -91,7 +86,24 @@ See [`../io/connections.md`](../io/connections.md) for the full 12-pin FFC pinou
 
 ## PC USB-C (panel-mount)
 
-USB4105-GF-A (GCT), mid-mount SMD. Data only — D+/D- to Teensy native USB device. Top panel, left zone.
+USB4105-GF-A (GCT), mid-mount SMD. Data only — D+/D- routed to **XMOS XU216 USB audio bridge** (not Teensy native USB). USB Audio Class 2 (24-in/8-out, 24-bit 48 kHz) + USB MIDI composite device. Top panel, left zone. USBLC6-2 ESD protection on D+/D- between connector and XMOS.
+
+Teensy's native USB device port is available via a debug header for firmware updates (not panel-accessible).
+
+---
+
+## XMOS XU216 ↔ Teensy (on-board connections)
+
+All connections are internal to the Main Board — no external cables.
+
+**TDM passive tap (9 signals):** XMOS taps existing TDM bus traces as high-Z inputs:
+- SAI1: BCLK (pin 21), LRCLK (pin 20), RX_DATA0 (pin 8), RX_DATA1 (pin 32), TX_DATA0 (pin 7)
+- SAI2: BCLK (pin 4), LRCLK (pin 3), RX_DATA0 (pin 5), RX_DATA1 (pin 34)
+
+**SPI control bus (4 signals):** MIDI forwarding between Teensy and XMOS:
+- CS (pin 10), MOSI (pin 11), MISO (pin 12), SCK (pin 13)
+
+**Return audio (1 signal, TBD):** XMOS TX data line → Teensy (candidate: pin 9 as SAI1_RX_DATA2)
 
 ---
 

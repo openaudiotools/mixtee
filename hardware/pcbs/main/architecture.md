@@ -50,6 +50,58 @@
 
 ---
 
+## XMOS XU216 USB Audio Bridge
+
+Dedicated USB Audio Class 2 bridge providing 24-in / 8-out multichannel audio + USB MIDI to the PC over a single USB-C connection. See [usb-audio.md](../../docs/usb-audio.md) for full architecture.
+
+### Chip
+
+- **XU216-256-TQ128-C20** — 128-pin TQFP, 256 KB RAM, 16 cores, 2000 MIPS
+- Open-source firmware: [xmos/sw_usb_audio](https://github.com/xmos/sw_usb_audio)
+
+### TDM Passive Tap
+
+The XMOS listens to both TDM buses as a slave — high-Z CMOS inputs tapping existing signals:
+
+- SAI1: BCLK (pin 21), LRCLK (pin 20), RX_DATA0 (pin 8), RX_DATA1 (pin 32), TX_DATA0 (pin 7)
+- SAI2: BCLK (pin 4), LRCLK (pin 3), RX_DATA0 (pin 5), RX_DATA1 (pin 34)
+- Total: 9 signals, all receive-only, no bus contention
+
+### SPI Control Bus (MIDI Forwarding)
+
+SPI0 (pins 10–13) connects Teensy ↔ XMOS for USB MIDI message exchange. Teensy is SPI master; XMOS is SPI slave. Polled at ~1 kHz.
+
+### Return Audio (PC → Mixer)
+
+8 channels from DAW playback. Data line TBD — candidates: pin 9 (SAI1_RX_DATA2), SAI3, or SPI DMA. Validate during breadboard Phase 1.
+
+### USB Connection
+
+PC USB-C D+/D- routed to XMOS (not Teensy). Teensy native USB available via debug header for firmware updates.
+
+### Power
+
+- Core: 1.0V LDO (AP2112K-1.0 or equiv.) from 3.3V or 5V rail, ~150 mA
+- I/O: 3.3V shared rail, ~50 mA
+- Decoupling: 0.1 µF on each VDD/VDDIO pin (~10 caps)
+
+### Clocking
+
+- 24 MHz crystal — XMOS core PLL reference
+- 24.576 MHz crystal — audio PLL reference (or derived from Teensy MCLK)
+- XMOS runs in TDM slave / USB adaptive mode — locks to Teensy's BCLK
+
+### Firmware Storage
+
+- W25Q32 QSPI flash (4 MB) — stores XMOS application firmware
+- Connected via XMOS QSPI port (dedicated pins, not shared with Teensy QSPI)
+
+### ESD Protection
+
+- USBLC6-2 on PC USB-C D+/D- lines (between connector and XMOS)
+
+---
+
 ## TCA9548A I2C Mux
 
 - Address **0x70** on main I2C bus (Wire, pins 18/19)
@@ -78,7 +130,7 @@
 
 - **SAI1 (TDM1):** pins 7, 8, 20, 21, 23, 32
 - **SAI2 (TDM2):** pins 2, 3, 4, 5, 33 (bottom), 34 (bottom)
-- **SPI0 (display):** pins 10, 11, 12, 13
+- **SPI0 (XMOS control):** pins 10, 11, 12, 13
 - **I2C (Wire):** pins 18, 19
 - **Serial3 RX (MIDI IN):** pin 15
 - **Serial4 TX (MIDI OUT):** pin 17
@@ -90,10 +142,10 @@
 
 | Pin | Function |
 |-----|----------|
-| 0, 1 | spare (Serial1 debug) |
+| 0, 1 | Serial1 — ESP32-S3 display UART |
 | 6 | NeoPixel data out |
-| 9 | RA8875 INT |
-| 14 | RA8875 RESET (reclaimed from Serial3 TX) |
+| 9 | *(candidate: XMOS return audio — SAI1_RX_DATA2)* |
+| 14 | *(spare — was RA8875 RESET)* |
 | 16 | Encoder 3 (Edit) push |
 | 22 | MCP23017 INT |
 | 24, 25, 28 | Encoder 1 (NavX) A, B, push |
@@ -107,7 +159,7 @@
 | 40 | Power button sense |
 | 41 | KEEP_ALIVE |
 
-**Total edge pins:** 42. **Consumed by peripherals:** 20. **GPIO:** 22 used, 0 spare (pins 0/1 reserved debug).
+**Total edge pins:** 42. **Consumed by peripherals:** 22 (SAI ×12, SPI0/XMOS ×4, I2C ×2, Serial1/ESP32 ×2, Serial3 RX ×1, Serial4 TX ×1). **GPIO:** 19 used + 1 candidate (pin 9), 1 spare (pin 14).
 
 ---
 

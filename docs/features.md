@@ -32,16 +32,15 @@
 
 ### Display
 
-**4.3" 480×272 TFT with RA8875 controller** (SPI, hardware-accelerated drawing)
+**ESP32-S3 integrated display module** (e.g., Waveshare ESP32-S3-Touch-LCD-4.3 800×480 or Elecrow CrowPanel 480×272)
 
-- Physical visible area: 93×56 mm
-- Resolution: 480×272 px
-- Wider aspect ratio (~16:9) suits horizontal channel strip layout
-- RA8875 provides built-in graphics RAM, font engine, and hardware rectangle/line primitives
-- Per-channel strip width: 120 px × 272 px (mono pair occupies 2 strips)
+- Self-contained module: ESP32-S3 MCU + LCD + touch controller on one board
+- Resolution: 800×480 (Waveshare) or 480×272 (Elecrow) — wider aspect ratio suits horizontal channel strip layout
+- ESP32-S3 runs LVGL for all rendering; Teensy sends meter data + parameter state over UART (2 wires)
+- Per-channel strip width: 120 px × display height (mono pair occupies 2 strips)
 - Stereo-linked pairs occupy 2 slots but grouped visually
-- 20-30 Hz UI refresh rate
-- SPI clock ≤22 MHz; partial redraws keep UI responsive
+- 30 Hz meter update rate over UART (~6 KB/s); parameter state sent on change
+- Frees SPI0 bus and 2 GPIO pins on Teensy (no display SPI bus contention)
 
 ### Color Scheme
 
@@ -114,15 +113,15 @@ When navigating laterally past the last channel in a view, the Nav encoder cross
 
 ## USB Audio Interface
 
-MIXTEE acts as a 2-in/2-out USB audio device over the dedicated PC USB-C port using Teensy 4.1's built-in USB Audio Class 1 support. No additional hardware required. Power comes from the separate PWR USB-C port, keeping computer noise off the power rails.
+MIXTEE provides **24-in / 8-out multichannel USB audio** over the dedicated PC USB-C port using an **XMOS XU216** USB Audio Class 2 bridge on the Main Board. The XMOS passively taps both TDM buses to capture all channels. Power comes from the separate PWR USB-C port, keeping computer noise off the power rails.
 
-- **To PC (2 in):** Master stereo mix routed to DAW as a USB sound card input
-- **From PC (2 out):** DAW playback routed into the mixer (e.g. backing tracks, click)
-- **Format:** 16-bit, 44.1 kHz (UAC1 standard)
-- **Composite device:** USB Audio + USB MIDI share the same USB-C connection
-- **Zero hardware cost:** firmware-only feature using existing Teensy USB stack
+- **To PC (24 in):** 16 pre-mix ADC inputs + 8 post-mixer bus outputs — full multitrack into any DAW
+- **From PC (8 out):** DAW playback routed into the mixer (e.g. stems, backing tracks, click)
+- **Format:** 24-bit, 48 kHz (USB Audio Class 2)
+- **Composite device:** USB Audio + USB MIDI share the same USB-C connection (MIDI forwarded between XMOS and Teensy via SPI)
+- **OS support:** Class-compliant on macOS/Linux (plug and play); Thesycon ASIO driver on Windows (included in XMOS ref design)
 
-See [usb-audio.md](usb-audio.md) for optional multitrack upgrade paths (UAC2, XMOS, ADAT hybrid).
+See [usb-audio.md](usb-audio.md) for full XMOS architecture and fallback options.
 
 ------
 

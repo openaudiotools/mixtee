@@ -2,7 +2,7 @@
 
 **Open-source 16-input / 8-output digital mixer with MIDI control and 16-track recording.**
 
-Built around the Teensy 4.1, MIXTEE is a compact desktop mixer designed for electronic musicians, synth enthusiasts, and DIY audio builders. It handles mixing, monitoring, MIDI control, multitrack recording to SD card, and 2-in/2-out USB audio — all in a 260 × 100 × 50 mm enclosure.
+Built around the Teensy 4.1, MIXTEE is a compact desktop mixer designed for electronic musicians, synth enthusiasts, and DIY audio builders. It handles mixing, monitoring, MIDI control, multitrack recording to SD card, and 24-in/8-out USB audio — all in a 260 × 100 × 50 mm enclosure.
 
 ![MIXTEE Layout](hardware/mixtee-layout.jpg)
 
@@ -11,7 +11,7 @@ Built around the Teensy 4.1, MIXTEE is a compact desktop mixer designed for elec
 - **16 mono inputs** (8 stereo pairs) with per-channel gain, pan, mute, solo
 - **8 outputs** (master stereo + 3 aux/FX sends)
 - **16-track recording** direct to SD card (48 kHz / 24-bit WAV, 8 MB PSRAM buffer)
-- **USB audio interface** (2-in / 2-out, USB Audio Class 1)
+- **USB audio interface** (24-in / 8-out via XMOS XU216, USB Audio Class 2)
 - **MIDI control** via 2× USB host ports + TRS MIDI in/out
 - **4.3" TFT display** with 3 dedicated encoders (NavX, NavY, Edit) and 16 illuminated CHOC keys
 - **Compact form factor** — 260 × 100 × 50 mm, all controls on top, all audio on back
@@ -67,7 +67,7 @@ mixtee/
 | [Firmware](docs/firmware.md) | Software architecture, audio pipeline, state management |
 | [UI Architecture](docs/ui-architecture.md) | Display hierarchy, navigation model, screen layouts |
 | [Enclosure](docs/enclosure.md) | Physical dimensions, panel layouts, connector placement |
-| [USB Audio](docs/usb-audio.md) | USB audio interface details and future upgrade options |
+| [USB Audio](docs/usb-audio.md) | XMOS XU216 USB audio bridge architecture (24ch multichannel) |
 | [Connector Parts](docs/connector-parts.md) | Connector MPN index |
 | [PCB Design Rules](docs/pcb-design-rules.md) | Trace widths, clearances, via sizes, stackup, manufacturing rules |
 

@@ -2,7 +2,9 @@ Category,Part,Quantity,Package,Alternate,Unit Cost (USD) Est.,Total Cost (USD) E
 Core Processing,Teensy 4.1,1,Module,,30.00,30.00,ARM Cortex-M7 @ 600 MHz; USB host; 2x TDM/I2S; built-in SD slot (SDIO)
 Core Processing,PSRAM 8 MB (QSPI),1,QSPI BGA,,4.00,4.00,IPS6404LSQ or APS6404L; solder to Teensy 4.1 bottom QSPI pads; multitrack recording buffer
 Core Processing,AK4619VN,4,QFN-32 (5x5mm 0.5mm pitch),,20.00-30.00,80.00-120.00,4-in/4-out audio codec; U1-U2 full (ADC+DAC); U3-U4 ADC only; I2C control; TDM audio
-UI Components,4.3 inch 480x272 TFT w/ RA8875,1,Module,,36.00,36.00,SPI interface; hardware drawing engine; PJRC RA8875_t4 library; 93x56 mm visible
+Core Processing,XMOS XU216-256-TQ128-C20,1,TQFP-128,,5.00,5.00,USB Audio Class 2 bridge; 24-in/8-out multichannel; TDM slave; on Main Board
+Core Processing,W25Q32 QSPI flash (4 MB),1,SOIC-8,,0.50,0.50,XMOS firmware storage; on Main Board
+UI Components,ESP32-S3 integrated display module (4.3 inch),1,Module,,25.00-40.00,25.00-40.00,Waveshare ESP32-S3-Touch-LCD-4.3 (800x480) or Elecrow CrowPanel (480x272); UART link to Teensy; runs LVGL
 UI Components,Rotary encoder with push (Bourns PEC11R-4215F-S0024),3,Through-hole,,5.00,15.00,24 detents; quadrature; push switch; NavX + NavY + Edit
 UI Components,Custom key PCB,1-2,PCB,,5.00-10.00,5.00-10.00,CHOC hotswap sockets + WS2812B-2020 + MCP23017 + 100nF caps; 4x4 grid
 UI Components,Kailh CHOC hotswap sockets,16,SMD,,0.30,4.80,Soldered to custom key PCB
@@ -12,7 +14,7 @@ UI Components,MCP23017 I2C GPIO expander,1,SOIC-28 / DIP-28,,1.50,1.50,4x4 key s
 UI Components,CHOC v2 key switches,16,Through-hole,,1.00,16.00,User-supplied or included; hotswap into custom PCB
 Power & Connectivity,TCA9548A I2C mux,1,TSSOP-24,,1.50,1.50,I2C bus switch; isolates codec boards; address 0x70
 Power & Connectivity,STUSB4500 breakout module (off-the-shelf),1,Module,,10.00-15.00,10.00-15.00,SparkFun PD Board or equivalent; USB-C PWR input; back panel; NVM configured for 5V only
-Power & Connectivity,USB-C receptacle (PCB-mount PC),1,Mid-mount SMD,,1.00,1.00,Main Board; PC port; data only (audio+MIDI); top panel
+Power & Connectivity,USB-C receptacle (PCB-mount PC),1,Mid-mount SMD,,1.00,1.00,Main Board; PC port; data only; routed to XMOS XU216 (24ch audio+MIDI); top panel
 Power & Connectivity,FE1.1s USB 2.0 hub IC,1,SSOP-28,,1.50,1.50,IO Board; upstream via FFC from Teensy USB host; 2 downstream to USB-A
 Power & Connectivity,12 MHz crystal,1,HC49/SMD,,0.50,0.50,IO Board; FE1.1s clock source; 15 pF load capacitors
 Power & Connectivity,TPS2051 power switch,2,SOT-23-5,,1.50,3.00,IO Board; USB host port per-port VBUS current limiting (500 mA each)
@@ -42,6 +44,10 @@ Power Regulation,ADP7118 LDO,3,SOIC-8,,2.50,7.50,5V to 3.3V_A ultra-low-noise an
 Power Regulation,TPS22965 load switch,1,SOT-23-6 / WSON-6,,1.50,1.50,Soft-start / inrush limiting; 5A continuous; controlled slew rate
 Power Regulation,10 mohm shunt resistor,1,2512/2010,,0.30,0.30,Current measurement test point on main 5V rail
 Power Regulation,74LVC1G00 NAND gate,1,SOT-23-5,,0.30,0.30,Soft-latch power SR latch; cleaner than 2x BSS138; fewer parts
+Power Regulation,1.0V LDO (AP2112K-1.0),1,SOT-23-5,,0.30,0.30,XMOS XU216 core supply; on Main Board
+Power Regulation,24 MHz crystal,1,HC49/SMD,,0.25,0.25,XMOS core clock; on Main Board
+Power Regulation,24.576 MHz crystal,1,HC49/SMD,,0.50,0.50,XMOS audio PLL reference; on Main Board
+Passives & Protection,USBLC6-2 ESD protection,1,SOT-23-6,,0.20,0.20,PC USB-C D+/D- ESD protection; on Main Board
 Power Regulation,Precision resistor 10k 0.1%,2,0603/0805,,0.10,0.20,2.5V virtual ground resistor divider (matched pair)
 Passives & Protection,Electrolytic capacitor 1000-2200 uF,2,Through-hole,,0.75,1.50,NeoPixel bulk capacitor + power entry bulk; sized for uncapped LED brightness
 Passives & Protection,Ceramic capacitor 0.1 uF,60,0402/0603/0805,,0.02,1.20,Local decoupling everywhere (ICs + op-amps + codec AVDD/DVDD)

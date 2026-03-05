@@ -57,9 +57,9 @@ MIXTEE is an open-source 16-input / 8-output digital mixer built around the Teen
 
 **I2C bus topology:** Teensy Wire (pins 18/19) → TCA9548A mux (0x70, main board) splits to codec boards; MCP23017 (0x20, Key PCB) sits upstream for key scanning.
 
-**Key hardware ICs:** AK4619VN (codec), TCA9548A (I2C mux), MCP23017 (GPIO expander), RA8875 (TFT controller), FE1.1s (USB hub, IO Board), STUSB4500 (USB PD sink), TPS22965 (load switch). **Off-the-shelf modules:** STUSB4500 breakout (power), TPA6132/MAX97220 breakout (headphone amp).
+**Key hardware ICs:** AK4619VN (codec), XMOS XU216 (USB audio bridge — 24-in/8-out UAC2, main board), TCA9548A (I2C mux), MCP23017 (GPIO expander), FE1.1s (USB hub, IO Board), STUSB4500 (USB PD sink), TPS22965 (load switch). **Off-the-shelf modules:** STUSB4500 breakout (power), TPA6132/MAX97220 breakout (headphone amp), ESP32-S3 integrated display module (UART link to Teensy, runs LVGL).
 
-**Connectivity:** Native Ethernet (DP83825I PHY on Teensy) via RJ45 MagJack on IO Board. USB MIDI host via FE1.1s hub (IO Board). MIDI IN/OUT via 3.5mm TRS Type A (IO Board).
+**Connectivity:** 24-in/8-out USB Audio Class 2 via XMOS XU216 (PC USB-C on main board). Native Ethernet (DP83825I PHY on Teensy) via RJ45 MagJack on IO Board. USB MIDI host via FE1.1s hub (IO Board). MIDI IN/OUT via 3.5mm TRS Type A (IO Board).
 
 **PCB architecture:** 6 unique PCB designs, 10 physical boards + 2 off-the-shelf modules. See `docs/system-topology.md`.
 
@@ -88,7 +88,7 @@ MIXTEE is an open-source 16-input / 8-output digital mixer built around the Teen
 - **Audio:** Block-based DSP (128 samples @ 48 kHz = 2.67 ms blocks), runs in timer interrupt
 - **Real-time constraint:** Audio callback preempts everything. No blocking operations, no long SPI transactions, no malloc in the audio path.
 - **UI framework:** Hierarchical View → Page → Module → Component → Parameter model (see `docs/ui-architecture.md`)
-- **Key libraries:** PJRC Audio, RA8875_t4, Adafruit NeoPixel, USBHost_t36, SdFat, Bounce, Encoder
+- **Key libraries:** PJRC Audio, Adafruit NeoPixel, USBHost_t36, SdFat, Bounce, Encoder (display handled by ESP32-S3 module via UART)
 
 ## Licensing
 
