@@ -103,4 +103,4 @@ The PJRC Audio Library runs on a timer interrupt and preempts all other code. Th
 - **Cap NeoPixel global brightness** (30% default recommended — reduces noise and power; hardware is sized for uncapped operation)
 - **Smooth parameter changes** (no abrupt steps in gain/pan — use ramping over 1-2 audio blocks)
 - **USB host power management** (ability to power-cycle ports via software)
-- **Pop suppression sequencing:** On boot, hold output mute relay/switch closed until DSP is initialized and stable (~500 ms), then ramp up. On shutdown (voltage drop detected), ramp down and mute before power loss.
+- **Pop suppression sequencing:** On boot, MCP23008 (address 0x21, on Board 1-top, accessed via TCA9548A Ch 0 → ISO1541) mute outputs default low (muted). After DSP is initialized and stable (~500 ms), firmware sets GP0–GP3 high to unmute. On shutdown, set GP0–GP3 low before power loss. MCP23008 also provides codec PDN control (GP4–GP5) and headphone detect input (GP6).

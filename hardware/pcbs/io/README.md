@@ -2,7 +2,7 @@
 
 **Dimensions:** ~50 x 80 mm | **Layers:** 2 | **Orientation:** Horizontal, under top panel (left side) | **Instances:** 1
 
-Handles Ethernet, USB MIDI host, MIDI IN/OUT, and provides a mounting area for an off-the-shelf headphone amp breakout module. All panel-mount components in the left column of the top panel.
+Handles Ethernet, USB MIDI host, and MIDI IN/OUT. All panel-mount components in the left column of the top panel. Headphone amp has moved to a standalone HP Board in the isolated analog domain.
 
 ## Key ICs
 
@@ -21,8 +21,6 @@ Handles Ethernet, USB MIDI host, MIDI IN/OUT, and provides a mounting area for a
 │                                                              │
 │  MIDI_IN (panel)  MIDI_OUT (panel)                          │
 │                                                              │
-│  VOL pot (panel)  HP breakout header                        │
-│                                                              │
 │  [FFC ZIF 12-pin]  [6-pin ETH header]                      │ y=80 (interior edge)
 └──────────────────────────────────────────────────────────────┘
  x=0                                                     x=50
@@ -30,8 +28,8 @@ Handles Ethernet, USB MIDI host, MIDI IN/OUT, and provides a mounting area for a
 
 ## See Also
 
-- [`connections.md`](connections.md) — FFC, Ethernet ribbon, HP header, panel-mount connector pinouts
-- [`architecture.md`](architecture.md) — USB hub, MIDI, Ethernet, HP amp circuit details
+- [`connections.md`](connections.md) — FFC, Ethernet ribbon, panel-mount connector pinouts
+- [`architecture.md`](architecture.md) — USB hub, MIDI, Ethernet circuit details
 
 ## Status
 

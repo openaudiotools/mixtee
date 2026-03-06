@@ -167,16 +167,14 @@ Available for GPIO: **20**
 | Encoder 2 (NavY) | **3** | A, B, push switch — vertical navigation |
 | Encoder 3 (Edit) | **3** | A, B, push switch — value editing |
 | NeoPixel data | **1** | Single data line to 16× WS2812B |
-| TS5A3159 mute control | **4** | 1 per output stereo pair |
-| Headphone detect | **1** | TRS jack switch input (from HP breakout area) |
 | Power button sense | **1** | Soft-latch button state (back panel button, wired to Main Board) |
 | KEEP_ALIVE | **1** | Hold soft-latch set during operation |
 | MCP23017 INT (optional) | **1** | Interrupt-driven key scan; can be omitted if polling |
 | MIDI OUT | **1** | Serial4 TX (pin 17) |
 | XMOS return audio (candidate) | **(1)** | Pin 9 — SAI1_RX_DATA2 if IOMUX validates; may remain spare |
-| **Total** | **19** (+1 candidate) | |
+| **Total** | **14** (+1 candidate) | |
 
-**Remaining spare: 1 pin** (pin 14, freed by ESP32-S3 display offload). Pin 9 is a candidate for XMOS return audio but requires iMXRT1062 IOMUX validation — if not usable as SAI1_RX_DATA2, it remains spare (2 spare total).
+**Remaining spare: 6 pins** (14, 30, 35, 37, 38, 39). Pins 30/35/37/38 freed by moving TS5A3159 mute control to MCP23008 on Board 1-top (isolated analog domain). Pin 39 freed by routing headphone detect via MCP23008 GP6 on Board 1-top instead of direct GPIO. Pin 9 is a candidate for XMOS return audio but requires iMXRT1062 IOMUX validation — if not usable as SAI1_RX_DATA2, it remains spare (7 spare total).
 
 ### Key Matrix via MCP23017
 
@@ -208,13 +206,13 @@ The 4×4 key matrix (16 keys) is handled entirely by a **MCP23017 I2C GPIO expan
 | **27** | Encoder 3 (Edit) — B | Input (pull-up) | Interrupt-capable; also A13/SCK1 |
 | **28** | Encoder 1 (NavX) — Push | Input (pull-up) | Also RX7 |
 | **29** | Encoder 2 (NavY) — A | Input (pull-up) | Interrupt-capable; vertical navigation; also CRX3 |
-| **30** | TS5A3159 mute — Main L/R | Output | Relocated from pin 34 (now SAI2_RX_DATA1); high = unmuted |
+| **30** | *(spare — was TS5A3159 mute Main L/R, moved to MCP23008 on Board 1-top)* | — | Freed by galvanic isolation; mute now via I2C |
 | **31** | Encoder 2 (NavY) — B | Input (pull-up) | Relocated from pin 32 (now SAI1_RX_DATA1); interrupt-capable |
-| **35** | TS5A3159 mute — AUX1 L/R | Output | **Bottom pad**; also TX8/RX8 |
+| **35** | *(spare — was TS5A3159 mute AUX1, moved to MCP23008 on Board 1-top)* | — | **Bottom pad**; freed by galvanic isolation |
 | **36** | Encoder 2 (NavY) — Push | Input (pull-up) | |
-| **37** | TS5A3159 mute — AUX2 L/R | Output | |
-| **38** | TS5A3159 mute — AUX3 L/R | Output | Also A14 |
-| **39** | Headphone detect | Input (pull-up) | TRS jack switch from HP breakout area (short wire to Main Board); also A15 |
+| **37** | *(spare — was TS5A3159 mute AUX2, moved to MCP23008 on Board 1-top)* | — | Freed by galvanic isolation |
+| **38** | *(spare — was TS5A3159 mute AUX3, moved to MCP23008 on Board 1-top)* | — | Also A14; freed by galvanic isolation |
+| **39** | *(spare — was headphone detect, now via MCP23008 GP6 on Board 1-top)* | — | Also A15; freed by galvanic isolation |
 | **40** | Power button sense | Input (pull-up) | Back panel button wired to Main Board soft-latch; also A16 |
 | **41** | KEEP_ALIVE | Output | Holds soft-latch set; release to shut down; also A17 |
 

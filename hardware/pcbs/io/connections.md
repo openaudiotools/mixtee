@@ -36,27 +36,16 @@ Note: Ethernet signals are post-PHY analog -- cable-tolerant. Only USB Full-Spee
 
 6-pin 2.54mm pitch header, ~100mm ribbon cable. Signals route through 0.1uF coupling caps on IO Board to RJ45 MagJack transformer.
 
-## HP Amp Breakout Header (4-pin)
-
-| Pin | Signal | Notes |
-|-----|--------|-------|
-| 1 | HP_L | Headphone left (from Main Board codec DAC) |
-| 2 | HP_R | Headphone right (from Main Board codec DAC) |
-| 3 | 5V_A | Analog power for amp module |
-| 4 | GND | Ground |
-
-4-pin 2.54mm pitch header. HP signals route from Main Board directly to breakout module via short wires -- NOT via FFC.
-
 ## Panel-Mount Connectors
 
 | Connector | Type | Notes |
 |-----------|------|-------|
-| MIDI HOST | Dual stacked USB-A (Amphenol 67298-4090) | 2x USB host ports |
+| MIDI HOST | Dual stacked USB-A (Amphenol 67298-4090) | 2× USB host ports |
 | ETH | RJ45 MagJack (integrated magnetics) | 10/100 Mbps Ethernet |
 | MIDI IN | 3.5mm TRS Type A (CUI SJ-3523-SMT) | Optocoupler-isolated input |
 | MIDI OUT | 3.5mm TRS Type A (CUI SJ-3523-SMT) | Current-loop output |
-| Headphone | 1/4" TRS (Switchcraft 35RASMT2BHNTRX) | Stereo, with detect switch |
-| Volume | 10k-ohm log potentiometer | Headphone volume |
+
+Headphone amp, jack, and volume pot have moved to the standalone **HP Board** — see [`../hp/connections.md`](../hp/connections.md).
 
 All panel-mount components in left column of top panel.
 

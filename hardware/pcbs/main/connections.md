@@ -4,19 +4,20 @@ Interface contract for the Main Board — the central hub connecting all other b
 
 ---
 
-## FFC to Input Mother Boards (16-pin 1.0mm ZIF, ×2)
+## FFC to Input Mother Boards (20-pin 1.0mm ZIF, ×2, galvanically isolated)
 
-See [`../input-mother/connections.md`](../input-mother/connections.md) for the full 16-pin FFC pinout. Summary:
+See [`../input-mother/connections.md`](../input-mother/connections.md) for the full 20-pin FFC pinout. Summary:
 
-- Pins 1–3: TDM clocks (MCLK, BCLK, LRCLK)
-- Pins 4, 13: TDM data in (one per codec)
-- Pin 5: TDM data out
-- Pins 6–7: I2C (via TCA9548A mux channels)
-- Pin 8: 5V_DIG, Pin 9: 5V raw
-- Pins 10–12: GND
-- Pins 14–16: spare
+- Pins 1–4: TDM clocks + TX data (isolated via Si8662BB forward channels)
+- Pins 5, 7: TDM RX data (isolated via Si8662BB reverse channels)
+- Pins 9–10: I2C SDA/SCL (isolated via ISO1541)
+- Pins 12–13: 5V_ISO (×2, from MEJ2S0505SC isolated DC-DC)
+- Pins 6, 8, 11, 14–15, 17, 20: GND_ISO (×7 — low-impedance isolated return)
+- Pins 16, 18–19: Spare
 
-**Connector:** Molex 5025861690 (16-pin 1.0mm ZIF).
+All signals on the FFC are in the isolated analog domain. Galvanic isolation components (Si8662BB-B-IS1, ISO1541DR, MEJ2S0505SC) are on the Main Board — see [architecture](architecture.md#galvanic-isolation).
+
+**Connector:** 20-pin 1.0mm ZIF socket.
 **Cable:** ~40–50mm FFC.
 **Instances:** Two — one per Input Mother Board (TDM1 vs TDM2).
 

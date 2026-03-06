@@ -148,7 +148,7 @@ MIXTEE uses **TDM128 mode** (Mode 8 in Table 2 of the datasheet):
 ### Clock Distribution
 
 ```
-Teensy SAI1/SAI2
+Teensy SAI1/SAI2 → [Si8662BB isolator on Main Board] → FFC (isolated side)
     ├── MCLK (256fs = 12.288 MHz) ─── FFC pin 1 ──→ U1 pin 8, U2 pin 8
     ├── BCLK (128fs = 6.144 MHz)  ─── FFC pin 2 ──→ U1 pin 7, U2 pin 7
     └── LRCLK (fs = 48 kHz)      ─── FFC pin 3 ──→ U1 pin 6, U2 pin 6
@@ -164,10 +164,10 @@ Both codecs on each Input Mother Board share the same MCLK, BICK, and LRCK lines
 
 | Bus | Codec | SDOUT → FFC Pin | Teensy Pin | SAI Function |
 |-----|-------|----------------|------------|-------------|
-| SAI1 | U1 | FFC pin 4 | **8** | SAI1_RX_DATA0 |
-| SAI1 | U2 | FFC pin 13 | **32** | SAI1_RX_DATA1 |
-| SAI2 | U3 | FFC pin 4 | **5** | SAI2_RX_DATA0 |
-| SAI2 | U4 | FFC pin 13 | **34** (bottom pad) | SAI2_RX_DATA1 |
+| SAI1 | U1 | FFC pin 5 (TDM_RX0_ISO) | **8** | SAI1_RX_DATA0 |
+| SAI1 | U2 | FFC pin 7 (TDM_RX1_ISO) | **32** | SAI1_RX_DATA1 |
+| SAI2 | U3 | FFC pin 5 (TDM_RX0_ISO) | **5** | SAI2_RX_DATA0 |
+| SAI2 | U4 | FFC pin 7 (TDM_RX1_ISO) | **34** (bottom pad) | SAI2_RX_DATA1 |
 
 Both codecs on a bus still share the same clock lines (MCLK, BCLK, LRCLK) and the same TX data line (SDIN1). Each codec independently drives TDM slots 0–3 on its own SDOUT line — no bus contention. The Teensy receives 4 channels per data line, 8 channels total per SAI bus.
 
@@ -179,14 +179,14 @@ Both codecs on a bus still share the same clock lines (MCLK, BCLK, LRCLK) and th
 
 | AK4619 Pin | Pin Name | Connection | Signal |
 |-----------|----------|------------|--------|
-| 1 | SDIN1 | FFC pin 5 → Teensy pin 7 | TDM TX data (Teensy → U1 DAC) |
+| 1 | SDIN1 | FFC pin 4 (TDM_TX_ISO) → Teensy pin 7 | TDM TX data (Teensy → U1 DAC, via Si8662BB) |
 | 2 | SDIN2 | VSS2 | Unused in TDM |
 | 3 | TVDD | 3.3 V_A | Digital supply |
 | 4 | VSS2 | GND | Digital ground |
 | 5 | AVDRV | 2.2 µF cap to VSS2 | Internal LDO output |
-| 6 | LRCK | FFC pin 3 → Teensy pin 20 | Frame sync |
-| 7 | BICK | FFC pin 2 → Teensy pin 21 | Bit clock |
-| 8 | MCLK | FFC pin 1 → Teensy pin 23 | Master clock |
+| 6 | LRCK | FFC pin 3 (LRCLK_ISO) → Teensy pin 20 | Frame sync (via Si8662BB) |
+| 7 | BICK | FFC pin 2 (BCLK_ISO) → Teensy pin 21 | Bit clock (via Si8662BB) |
+| 8 | MCLK | FFC pin 1 (MCLK_ISO) → Teensy pin 23 | Master clock (via Si8662BB) |
 | 9 | AIN5R | Open | Unused analog input |
 | 10 | AIN4R | Input buffer → Ch 2R jack | ADC2 Rch = mixer channel 2 |
 | 11 | AIN5L | Open | Unused analog input |
@@ -206,10 +206,10 @@ Both codecs on a bus still share the same clock lines (MCLK, BCLK, LRCLK) and th
 | 25 | AOUT2R | Reconstruction filter → AUX1 R | DAC2 Rch output |
 | 26 | PDN | TVDD via 10 kΩ (or FFC spare) | Power-down control |
 | 27 | CAD | VSS2 | I2C address = 0x10 |
-| 28 | SCL | FFC pin 7 → TCA9548A Ch 0 → Teensy pin 19 | I2C clock (via mux) |
+| 28 | SCL | FFC pin 10 (I2C_SCL_ISO) → ISO1541 → TCA9548A Ch 0 → Teensy pin 19 | I2C clock (via isolator + mux) |
 | 29 | SI | VSS2 | Unused (I2C mode) |
-| 30 | SDA | FFC pin 6 → TCA9548A Ch 0 → Teensy pin 18 | I2C data (via mux) |
-| 31 | SDOUT1 | FFC pin 4 → Teensy pin 8 | TDM RX data (U1 ADC → Teensy) |
+| 30 | SDA | FFC pin 9 (I2C_SDA_ISO) → ISO1541 → TCA9548A Ch 0 → Teensy pin 18 | I2C data (via isolator + mux) |
+| 31 | SDOUT1 | FFC pin 5 (TDM_RX0_ISO) → Si8662BB → Teensy pin 8 | TDM RX data (U1 ADC → Teensy) |
 | 32 | SDOUT2 | Open | Goes low in TDM mode |
 | — | Exposed Pad | VSS1 | Thermal/ground pad |
 
@@ -228,7 +228,7 @@ Identical to U1 except:
 | DAC1 R (pin 23) | Main R | **AUX2 R** |
 | DAC2 L (pin 24) | AUX1 L | **AUX3 L** |
 | DAC2 R (pin 25) | AUX1 R | **AUX3 R** |
-| SDOUT1 (pin 31) | FFC pin 13 → Teensy pin 32 | **SAI1_RX_DATA1** (separate from U1) |
+| SDOUT1 (pin 31) | FFC pin 7 (TDM_RX1_ISO) → Si8662BB → Teensy pin 32 | **SAI1_RX_DATA1** (separate from U1) |
 
 All other pins (power, clocks, I2C, unused inputs) are wired identically to U1.
 
@@ -243,7 +243,7 @@ Same physical wiring pattern as U1, with these differences:
 | BICK (pin 7) | Teensy pin 21 | Teensy pin **4** |
 | LRCK (pin 6) | Teensy pin 20 | Teensy pin **3** |
 | SDIN1 (pin 1) | Teensy pin 7 | Teensy pin **2** |
-| SDOUT1 (pin 31) | FFC pin 4 → Teensy pin 8 (SAI1_RX_DATA0) | FFC pin 4 → Teensy pin **5** (SAI2_RX_DATA0) |
+| SDOUT1 (pin 31) | FFC pin 5 → Teensy pin 8 (SAI1_RX_DATA0) | FFC pin 5 → Teensy pin **5** (SAI2_RX_DATA0) |
 | CAD (pin 27) | VSS2 → 0x10 | VSS2 → **0x10** (same address, isolated via TCA9548A Ch 1) |
 | ADC inputs | Ch 1–4 | **Ch 9–12** |
 | DAC outputs (pins 22–25) | Used (Main + AUX1) | **Unused — leave open** |
@@ -255,7 +255,7 @@ Same as U3 except:
 | Difference | U3 | U4 |
 |-----------|----|----|
 | CAD (pin 27) | VSS2 → 0x10 | TVDD → **0x11** |
-| SDOUT1 (pin 31) | FFC pin 4 → Teensy pin 5 (SAI2_RX_DATA0) | FFC pin 13 → Teensy pin **34** (**SAI2_RX_DATA1**, bottom pad) |
+| SDOUT1 (pin 31) | FFC pin 5 → Teensy pin 5 (SAI2_RX_DATA0) | FFC pin 7 → Teensy pin **34** (**SAI2_RX_DATA1**, bottom pad) |
 | ADC inputs | Ch 9–12 | **Ch 13–16** |
 | DAC outputs | Unused | **Unused — leave open** |
 
@@ -281,15 +281,23 @@ Each AK4619VN codec requires the following power connections:
 
 ```
 PWR USB-C (5V, Power Board) → cable → TPS22965 → Main Board 5V rail
-                                    ↓
-                            FFC pin 9 (5V raw)
-                                    ↓
-                    ADP7118 LDO (on each Input Mother Board) → 3.3V_A
-                                                                  ↓
-                                                  AVDD (pin 18) + TVDD (pin 3) on each codec
+                                                        ↓
+                                              MEJ2S0505SC isolated DC-DC (×2, on Main Board)
+                                                        ↓
+                                              FFC pins 12-13 (5V_ISO, paralleled)
+                                                        ↓
+                                      Ferrite bead (600Ω) → 10 µF ceramic (post-filter)
+                                                        ↓
+                                    ADP7118 LDO (on each Input Mother Board) → 3.3V_A
+                                                                                  ↓
+                                                              AVDD (pin 18) + TVDD (pin 3) on each codec
 ```
 
-Each Input Mother Board has its own ADP7118 LDO, converting the 5V raw supply from FFC pin 9 to a clean 3.3V_A rail for its two codecs. A third ADP7118 on the Main Board provides 3.3V_A for the virtual ground buffer; this 5V_A rail also powers the off-the-shelf headphone amp breakout module (TPA6132 or MAX97220) via a short wire from the Main Board. VSS1 and VSS2 connect to a common ground plane — no hard split between analog and digital grounds, per MIXTEE grounding strategy.
+Each Input Mother Board has its own ADP7118 LDO, converting the galvanically isolated 5V_ISO supply to a clean 3.3V_A rail for its two codecs. A ferrite bead + ceramic cap post-filter between the FFC and ADP7118 input attenuates DC-DC switching ripple. Combined with ADP7118 PSRR (>60 dB), total rejection at the DC-DC switching frequency exceeds 100 dB.
+
+A third ADP7118 on the Main Board provides 3.3V_A for the virtual ground buffer (digital domain). The HP amp receives 5V_ISO and Master L/R audio from Board 1-top via a dedicated 4-pin JST-PH cable.
+
+VSS1 and VSS2 connect to a common GND_ISO plane on each Mother Board — galvanically isolated from the digital domain's GND.
 
 **Critical notes:**
 - AVDRV (pin 5) is the internal 1.2 V LDO output. Do NOT connect to any other device or load — decoupling cap only.
@@ -440,7 +448,7 @@ The following items require validation during Phase 1 breadboard bring-up:
 
 **Status:** Resolved — separate SDOUT lines per codec.
 
-Each codec gets its own SDOUT → SAI RX data pin (U1→pin 8 RX_DATA0, U2→pin 32 RX_DATA1, U3→pin 5 RX_DATA0, U4→pin 34 RX_DATA1). Requires PJRC Audio Library modification to enable SAI multi-data-line receive (SAI_RCR3 register). FFC pin 13 carries the second codec's SDOUT on each cable. See "Separate SDOUT Lines" section above and pin-mapping.md for full details.
+Each codec gets its own SDOUT → SAI RX data pin (U1→pin 8 RX_DATA0, U2→pin 32 RX_DATA1, U3→pin 5 RX_DATA0, U4→pin 34 RX_DATA1). Requires PJRC Audio Library modification to enable SAI multi-data-line receive (SAI_RCR3 register). FFC pin 5 carries codec 1 SDOUT and FFC pin 7 carries codec 2 SDOUT on each cable (via Si8662BB reverse channels). See "Separate SDOUT Lines" section above and pin-mapping.md for full details.
 
 ### 2. Clock Compatibility with PJRC TDM Library
 
@@ -456,10 +464,7 @@ Verify that the AK4619VN SDOUT1 can drive the FFC cable trace (40–50 mm) at 6.
 
 ### 4. PDN Pin Control Strategy
 
-**Status:** Design decision needed.
+**Status:** Resolved.
 
-Decide whether PDN should be:
-- Tied to TVDD via 10 kΩ (simplest, codec always on when powered)
-- Controlled via FFC spare pin from Teensy GPIO (allows firmware-controlled reset/power-down)
-
-The second option uses one of the 4 spare FFC pins (13–16) and provides more control for debugging and power sequencing.
+- **Board 1-top:** PDN controlled via MCP23008 GPIO (GP4 for U1, GP5 for U2) on the isolated I2C bus. Allows firmware-controlled reset/power-down during boot sequencing and debugging.
+- **Board 2-top:** PDN tied to TVDD via 10 kΩ (always-on when powered). MCP23008 footprint present but unpopulated on Board 2-top.

@@ -20,6 +20,8 @@ Power & Connectivity,12 MHz crystal,1,HC49/SMD,,0.50,0.50,IO Board; FE1.1s clock
 Power & Connectivity,TPS2051 power switch,2,SOT-23-5,,1.50,3.00,IO Board; USB host port per-port VBUS current limiting (500 mA each)
 Power & Connectivity,USB-A dual stacked socket,1,Through-hole (Amphenol 67298-4090),,4.00,4.00,IO Board; 2x USB-A host ports for MIDI controllers; top panel
 Power & Connectivity,3.5mm TRS jack (MIDI IN),1,SMD (CUI SJ-3523-SMT),,1.50,1.50,IO Board; MIDI IN Type A (Tip=sink Ring=source Sleeve=shield); top panel
+Power & Connectivity,FFC 20-pin ZIF connector (Main-Mother),4,SMD 1.0mm pitch,,0.60,2.40,Main Board (x2) + Input Mother Board (x2); 20-pin 1.0mm FFC for galvanically isolated interconnect
+Power & Connectivity,FFC 20-pin cable (Main-Mother),2,1.0mm pitch 40-50mm,,0.60,1.20,Main to Input Mother Board interconnect cables (x2)
 Power & Connectivity,FFC 12-pin ZIF connector (Main-IO),2,SMD 1.0mm pitch,,0.50,1.00,Main Board (x1) + IO Board (x1); 12-pin 1.0mm FFC for Main-IO interconnect
 Power & Connectivity,FFC 12-pin cable (Main-IO),1,1.0mm pitch 100-120mm,,0.50,0.50,Main to IO Board interconnect cable
 Power & Connectivity,RJ45 MagJack (integrated magnetics),1,Through-hole panel-mount,,3.00-5.00,3.00-5.00,IO Board; Ethernet 10/100 Mbps; integrated transformer + LEDs; top panel
@@ -27,12 +29,16 @@ Power & Connectivity,6-pin header (Ethernet ribbon),2,Through-hole 2.54mm pitch,
 Power & Connectivity,6-pin ribbon cable (Ethernet),1,2.54mm pitch ~100mm,,0.50,0.50,Main Board to IO Board Ethernet connection
 Power & Connectivity,Momentary push button (panel mount screw-collar),1,Panel mount screw-collar,,2.00-4.00,2.00-4.00,Back panel; next to PWR USB-C; wired to Main Board soft-latch
 Power & Connectivity,Full-size SD card socket,1,Through-hole/SMD (Molex 472192001),,2.00-3.00,2.00-3.00,SDIO routed from Teensy bottom pads 42-47; top panel; built-in micro-SD slot unused
+Galvanic Isolation,Murata MEJ2S0505SC (isolated DC-DC),2,SIP-7 TH,,6.00,12.00,5V to 5V_ISO; 2W (400 mA); 5.2 kV isolation; 1 per FFC on Main Board
+Galvanic Isolation,Si8662BB-B-IS1 (6-ch digital isolator),2,SOIC-16W,,4.00,8.00,150 Mbps; 4 fwd + 2 rev channels; TDM signal isolation; 1 per FFC on Main Board
+Galvanic Isolation,ISO1541DR (isolated I2C),2,SOIC-8,,2.50,5.00,Bidirectional I2C isolator; 1 MHz; 1 per FFC on Main Board
 Audio I/O & Analog,Switchcraft 112BPC (1/4 inch TS jack),24,PCB-mount through-hole,,1.25,30.00,16 inputs + 8 outputs; 12.7mm mounting hole; back panel
-Audio I/O & Analog,1/4 inch TRS jack (Switchcraft 35RASMT2BHNTRX),1,PCB-mount through-hole,,2.00,2.00,IO Board; headphone output (stereo) with detect switch; top panel
-Audio I/O & Analog,Potentiometer 10k ohm log,1,Through-hole,,2.00,2.00,IO Board; headphone volume; dedicated analog pot; top panel
+Audio I/O & Analog,1/4 inch TRS jack (Switchcraft 35RASMT2BHNTRX),1,PCB-mount through-hole,,2.00,2.00,HP Board; headphone output (stereo) with detect switch; top panel
+Audio I/O & Analog,Potentiometer 10k ohm log,1,Through-hole,,2.00,2.00,HP Board; headphone volume; dedicated analog pot; top panel
 Audio I/O & Analog,OPA1678 (dual op-amp),17,SOIC-8,,1.20,20.40,Input buffers (8); anti-alias (8); output (4); reconstruction (4); virtual ground buffer (1 section); NJM4580 acceptable as budget substitute
-Audio I/O & Analog,HP amp breakout module (TPA6132/MAX97220),1,Module (~15x20mm),,2.00-5.00,2.00-5.00,Off-the-shelf; ground-referenced stereo HP driver; mounted near IO Board; receives HP_L/HP_R from Main Board
-Audio I/O & Analog,TS5A3159 analog switch,4,SOT-23-5,,1.00,4.00,Pop suppression; SPST per output stereo pair; GPIO-controlled; low Ron ~1 ohm; 5V tolerant
+Audio I/O & Analog,HP amp breakout module (TPA6132/MAX97220),1,Module (~15x20mm),,2.00-5.00,2.00-5.00,Off-the-shelf; ground-referenced stereo HP driver; on standalone HP Board (isolated analog domain); receives signal + power from Board 1-top
+Audio I/O & Analog,TS5A3159 analog switch,4,SOT-23-5,,1.00,4.00,Pop suppression; SPST per output stereo pair; on Board 1-top (isolated domain); controlled via MCP23008 I2C; low Ron ~1 ohm; 5V tolerant
+Audio I/O & Analog,MCP23008 I2C GPIO expander,1,SOIC-18,,1.00,1.00,Board 1-top; controls TS5A3159 mute + codec PDN + headphone detect; address 0x21
 Audio I/O & Analog,6N138 optocoupler,1,DIP-8,,1.00,1.00,IO Board; MIDI IN galvanic isolation; industry standard at 31.25 kbaud
 Audio I/O & Analog,1N4148 signal diode (MIDI),1,DO-35 / SOD-323,,0.05,0.05,IO Board; MIDI IN optocoupler LED reverse protection
 Audio I/O & Analog,Resistor 220 ohm (MIDI IN),1,0603/0805,,0.01,0.01,IO Board; MIDI IN series current limiting resistor
@@ -40,7 +46,7 @@ Audio I/O & Analog,Resistor 470 ohm (MIDI IN pullup),1,0603/0805,,0.01,0.01,IO B
 Power & Connectivity,3.5mm TRS jack (MIDI OUT),1,SMD (CUI SJ-3523-SMT),,1.50,1.50,IO Board; MIDI OUT Type A (Tip=sink Ring=source Sleeve=shield); top panel
 Passives & Protection,Resistor 33 ohm (MIDI OUT),1,0603/0805,,0.01,0.01,IO Board; MIDI OUT series resistor (Tip to MIDI_TX via FFC)
 Passives & Protection,Resistor 10 ohm (MIDI OUT),1,0603/0805,,0.01,0.01,IO Board; MIDI OUT source resistor (3.3V to Ring)
-Power Regulation,ADP7118 LDO,3,SOIC-8,,2.50,7.50,5V to 3.3V_A ultra-low-noise analog rail; <10 uV RMS; 1 per Input Mother Board (2) + 1 on Main Board (virtual ground; 5V_A routes to IO Board HP amp via FFC)
+Power Regulation,ADP7118 LDO,3,SOIC-8,,2.50,7.50,5V_ISO to 3.3V_A ultra-low-noise analog rail; <10 uV RMS; 1 per Input Mother Board (2) + 1 on Main Board (virtual ground buffer)
 Power Regulation,TPS22965 load switch,1,SOT-23-6 / WSON-6,,1.50,1.50,Soft-start / inrush limiting; 5A continuous; controlled slew rate
 Power Regulation,10 mohm shunt resistor,1,2512/2010,,0.30,0.30,Current measurement test point on main 5V rail
 Power Regulation,74LVC1G00 NAND gate,1,SOT-23-5,,0.30,0.30,Soft-latch power SR latch; cleaner than 2x BSS138; fewer parts
@@ -51,7 +57,7 @@ Passives & Protection,USBLC6-2 ESD protection,1,SOT-23-6,,0.20,0.20,PC USB-C D+/
 Power Regulation,Precision resistor 10k 0.1%,2,0603/0805,,0.10,0.20,2.5V virtual ground resistor divider (matched pair)
 Passives & Protection,Electrolytic capacitor 1000-2200 uF,2,Through-hole,,0.75,1.50,NeoPixel bulk capacitor + power entry bulk; sized for uncapped LED brightness
 Passives & Protection,Ceramic capacitor 0.1 uF,60,0402/0603/0805,,0.02,1.20,Local decoupling everywhere (ICs + op-amps + codec AVDD/DVDD)
-Passives & Protection,Ferrite bead,3,0805,,0.15,0.45,5V_DIG to LDO input isolation; belt-and-suspenders with LDO
+Passives & Protection,Ferrite bead,5,0805,,0.15,0.75,Post-isolation filter on each Mother Board (x2) + USB GND + misc
 Passives & Protection,Resistor 300-500 ohm,1,0805,,0.02,0.02,NeoPixel data line series resistor (reduces ringing)
 Passives & Protection,Polyfuse 2.5A/5A,1,Through-hole/SMD,,0.50,0.50,Main Board 5V rail input; overcurrent protection (power module may include its own)
 Passives & Protection,1N4148 signal diode (key matrix),16,SOD-323,,0.05,0.80,Anti-ghosting diodes for 4x4 key matrix on Key PCB
@@ -62,9 +68,10 @@ Passives & Protection,Resistors 1k ohm,60,0603/0805,,0.01,0.60,Filter networks; 
 Passives & Protection,Resistors misc values,20,0603/0805,,0.01,0.20,Input attenuation dividers; output series (100 ohm); misc
 Passives & Protection,AC coupling caps 10 uF,16,0805/through-hole,,0.10,1.60,Input DC blocking (10 uF + 10k = ~1.6 Hz HPF)
 Passives & Protection,AC coupling caps 47 uF,8,Through-hole,,0.15,1.20,Output DC blocking
+Passives & Protection,Ceramic capacitor 10 uF (post-isolation filter),2,0805,,0.10,0.20,Post-MEJ2S0505SC filter on each Mother Board; before ADP7118 LDO input
 Passives & Protection,Ceramic capacitor 15 pF,2,0402/0603,,0.02,0.04,IO Board; FE1.1s crystal load capacitors
 Passives & Protection,Ceramic capacitor 0.1 uF (Ethernet coupling),1,0603,,0.02,0.02,IO Board; AC coupling between Teensy PHY and RJ45 MagJack
 Passives & Protection,Soft-latch passives (R + C misc),1,0603/0805,,0.50,0.50,Debounce cap; RC timeout network; pull-up/pull-down resistors for latch
-Fabrication,PCB fabrication (prototype),1,,,30.00-60.00,30.00-60.00,Main (4L) + IO (2L left side) + input mother (4L) + daughter/output (2L) + key (2L); prototype qty; power module + HP amp are off-the-shelf
+Fabrication,PCB fabrication (prototype),1,,,35.00-70.00,35.00-70.00,Main (4L) + IO (2L) + HP (2L) + input mother (4L) + daughter/output (2L) + key (2L); prototype qty; power module is off-the-shelf
 Fabrication,Enclosure (DIY/3D print or kit),1,,,20.00-50.00,20.00-50.00,260x100x50 mm (WxDxH)
 User Supplied,SD card (UHS-I U3 / V30),1,Full-size SD,,8.00-15.00,,User-supplied; 32-64 GB recommended; pre-format 64 KB clusters

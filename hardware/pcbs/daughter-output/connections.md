@@ -8,8 +8,8 @@
 | 2 | AIN2 / OUT2 | Analog signal |
 | 3 | AIN3 / OUT3 | Analog signal |
 | 4 | AIN4 / OUT4 | Analog signal |
-| 5 | +5V_A | Analog power from mother/output board |
-| 6 | GND | Ground |
+| 5 | 5V_ISO | Isolated analog power from mother board |
+| 6 | GND_ISO | Isolated ground |
 
 Connector: 6-pin JST-PH (B6B-PH-K-S), 2.0mm pitch, ~15–20mm wire harness. Flexible cable accommodates both boards hanging off the same back panel jacks.
 

@@ -76,19 +76,19 @@
 - **NeoPixels (16 keys):** ~320 mA typical (at 30% cap), 960 mA worst-case (uncapped)
 - **ESP32-S3 display module:** Self-powered from 5V_DIG (~250-350 mA including backlight)
 - **Teensy + logic:** ~200 mA
-- **Audio analog stages:** ~200-300 mA
+- **Isolated analog domain (via 2× MEJ2S0505SC):** ~400 mA total (2× codecs, op-amps, ADP7118 LDOs, TS5A3159, MCP23008, HP amp)
 - **XMOS XU216 (USB audio bridge):** ~200 mA (core 1.0V LDO + I/O 3.3V)
-- **Worst-case total:** ~3.01 A (with uncapped NeoPixels)
-- **With 20% reserve:** ~3.61 A
+- **Worst-case total:** ~2.87 A (with uncapped NeoPixels)
+- **With 20% reserve:** ~3.44 A
 - **Supply target:** 5V @ 5A via USB PD (headroom for uncapped NeoPixels + builder modifications)
 
 ### Power Distribution
 
-5V rail is split into 5V_DIG (noisy loads: USB, NeoPixels, TFT) and 5V_A (low-noise LDO for audio). TPS22965 load switch provides soft-start. ADP7118 LDOs (3 instances) generate clean 3.3V_A rails. See [Main Board architecture](../hardware/pcbs/main/architecture.md) for detailed power distribution design.
+5V rail is split into 5V_DIG (noisy digital loads: USB, NeoPixels, TFT) and 5V_ISO (galvanically isolated analog domain via MEJ2S0505SC DC-DC converters). TPS22965 load switch provides soft-start. ADP7118 LDOs (3 instances — 2 on Input Mother Boards, 1 on Main Board) generate clean 3.3V_A rails. See [Main Board architecture](../hardware/pcbs/main/architecture.md) for detailed power distribution and galvanic isolation design.
 
 *USB host hub details: see [IO Board architecture](../hardware/pcbs/io/architecture.md).*
 
-*Headphone amplifier details: see [IO Board architecture](../hardware/pcbs/io/architecture.md).*
+*Headphone amplifier details: see [HP Board architecture](../hardware/pcbs/hp/architecture.md).*
 
 *Ethernet details: see [IO Board architecture](../hardware/pcbs/io/architecture.md).*
 
@@ -98,51 +98,65 @@
 
 *Soft-latch power circuit details: see [Main Board architecture](../hardware/pcbs/main/architecture.md).*
 
+*Galvanic isolation details: see [Main Board architecture](../hardware/pcbs/main/architecture.md#galvanic-isolation).*
+
 ------
 
 ## PCB Layer Stackup
 
 | Board | Layers | Stackup | Rationale |
 |-------|--------|---------|-----------|
-| Main Board | **4-layer** | Sig / GND / PWR / Sig | TDM clock integrity (24.576 MHz BCLK), mixed-signal ground plane, power distribution |
+| Main Board | **4-layer** | Sig / GND / PWR / Sig | TDM clock integrity (24.576 MHz BCLK), galvanic isolation boundary (GND + GND_ISO islands), power distribution |
 | IO Board | **2-layer** | Sig / GND | USB Full-Speed (12 Mbps), post-PHY Ethernet analog, MIDI — no high-speed digital |
 | Power Module | Off-the-shelf | — | STUSB4500 USB PD breakout (purchased module, no custom PCB) |
-| Input Mother Board | **4-layer** | Sig / GND / PWR / Sig | AK4619VN codecs + analog input stages + TDM signals need solid ground reference |
-| Input Daughter Board | **2-layer** | Sig / GND | Simple board: jacks + ESD diodes + connector, no high-speed signals |
-| Output Board | **2-layer** | Sig / GND | Simple board: jacks + ESD diodes + connector, no high-speed signals |
+| Input Mother Board | **4-layer** | Sig / GND_ISO / PWR_ISO / Sig | AK4619VN codecs + analog input stages + TDM signals; entirely on GND_ISO (isolated domain) |
+| Input Daughter Board | **2-layer** | Sig / GND_ISO | Simple board: jacks + ESD diodes + connector; inherits isolation from mother board |
+| Output Board | **2-layer** | Sig / GND_ISO | Simple board: jacks + ESD diodes + connector; inherits isolation from mother board |
+| HP Board | **2-layer** | Sig / GND_ISO | Headphone amp breakout + volume pot + TRS jack; entirely on GND_ISO |
 | Key PCB | **2-layer** | Sig / GND | Switches + LEDs only, no high-speed signals |
 
 ------
 
 ## Noise Mitigation Strategy
 
+### Galvanic Isolation (Primary)
+
+The primary noise mitigation is **galvanic isolation** between the digital domain (Main Board, IO Board, Key PCB) and the analog domain (Input Mother Boards, Daughter/Output Boards, HP Board). No shared copper between domains — all signals and power cross the boundary through isolators:
+
+- **Si8662BB-B-IS1** digital isolators (×2) for TDM signals (150 Mbps, 6-channel)
+- **ISO1541DR** isolated I2C (×2) for codec/MCP23008 control
+- **MEJ2S0505SC** isolated DC-DC converters (×2) for analog domain power
+
+This eliminates USB ground loops, switching noise, and NeoPixel current spikes from the analog signal path entirely — not just attenuated, but physically absent.
+
 ### Power Integrity
 
-1. **Bulk capacitor (1000-2200 µF)** across 5V/GND near NeoPixels (buffers current spikes from up to 960 mA worst-case draw)
-2. **Ferrite bead + decoupling** between 5V_DIG and 5V_A (isolates audio analog)
-3. **Local decoupling** at every IC and subsystem boundary (0.1 µF ceramic + bulk)
-4. **NeoPixel series resistor (300-500 Ω)** in data line near first pixel (reduces ringing)
+1. **Bulk capacitor (1000–2200 µF)** across 5V/GND near NeoPixels (buffers current spikes from up to 960 mA worst-case draw)
+2. **Isolated DC-DC (MEJ2S0505SC)** provides galvanic separation between digital and analog power — replaces ferrite bead approach
+3. **Post-filter on analog boards:** ferrite bead (600Ω @ 100 MHz) + 10 µF ceramic after 5V_ISO, before ADP7118 LDO input. Combined PSRR >100 dB at DC-DC switching frequency
+4. **Local decoupling** at every IC and subsystem boundary (0.1 µF ceramic + bulk)
+5. **NeoPixel series resistor (300–500 Ω)** in data line near first pixel (reduces ringing)
 
 ### Grounding
 
-- **Single continuous ground plane** on PCB (don't hard-split analog/digital grounds)
-- **Star topology** for high-current returns (USB, NeoPixels, TFT backlight) near power entry
-- **Keep audio ground references tight** around codec and output jacks
-- **Separate return paths** for noisy digital and sensitive analog currents
-- **Component placement strategy:** Power entry on one end of main board → Teensy + UI (display, encoders, keys) in center → audio codecs + analog stages + jacks on opposite end. USB hub and MIDI circuits are on the IO Board, physically separated from the main board audio paths. This ensures high-current digital return paths don't cross under the audio section of the ground plane
+- **Digital domain (Main Board):** Single continuous GND plane with star topology for high-current returns (USB, NeoPixels, TFT backlight)
+- **Analog domain (Mother Boards, HP Board):** Continuous GND_ISO plane, entirely isolated from digital GND
+- **Main Board isolation boundary:** GND_ISO exists only as small copper islands around isolator Side 2 pins and FFC pads. **≥1 mm clearance** between GND and GND_ISO copper on all layers
+- **No ground connection** between domains — isolation integrity must be maintained through layout
 
 ### Layout
 
-- **Physical separation:** USB hub/switching away from audio codecs and outputs
-- **Short audio traces:** minimize analog signal path length
-- **Keep digital noise away:** TFT, USB, NeoPixel data lines routed away from audio
-- **Shielding (optional):** ground pour between noisy and analog sections
+- **Physical separation:** USB hub/switching away from audio codecs and outputs (on separate boards)
+- **Isolation component placement:** MEJ2S0505SC, Si8662BB, ISO1541 placed near each FFC connector on Main Board
+- **Keep DC-DC away from signal isolators:** MEJ2S0505SC switching noise could couple into Si8662BB signal pins
+- **Short audio traces:** minimize analog signal path length on Mother Boards
 
 ### Firmware-Based Noise Mitigation
 
 - **Cap NeoPixel global brightness** (30% default recommended — reduces noise and power; hardware is sized for uncapped operation in case builders remove the limit)
 - **Smooth parameter changes** (no abrupt steps in gain/pan)
 - **USB host power management** (ability to power-cycle ports via software)
+- **I2C mute sequencing:** MCP23008 mute outputs held low during boot; high after DSP stabilizes (~500 ms)
 
 ------
 
@@ -192,12 +206,13 @@
 | Part                          | Quantity | Notes                                          |
 | ----------------------------- | -------- | ---------------------------------------------- |
 | 1/4" TS panel jacks           | 24       | 16 inputs + 8 outputs                          |
-| 1/4" TRS panel jack           | 1        | Headphone output (stereo) on IO Board, top panel |
-| Potentiometer (10 kΩ log)     | 1        | Headphone volume on IO Board, dedicated analog pot, top panel |
+| 1/4" TRS panel jack           | 1        | Headphone output (stereo) on HP Board, top panel |
+| Potentiometer (10 kΩ log)     | 1        | Headphone volume on HP Board, dedicated analog pot, top panel |
 | OPA1678 (dual op-amp, SOIC-8) | 16       | Input buffers (8), anti-alias (8), output (4), reconstruction (4) — estimate, refine in schematic |
 | NJM4580 (alternate)           | 16       | Budget-friendly alternate to OPA1678            |
-| TS5A3159 analog switch (SOT-23-5) | 4    | Pop suppression — 1 per output stereo pair (Main, AUX1-3) |
-| HP amp breakout module (TPA6132/MAX97220) | 1 | Off-the-shelf; ground-referenced stereo HP driver, 25mW/32Ω; mounted near IO Board |
+| TS5A3159 analog switch (SOT-23-5) | 4    | Pop suppression — 1 per output stereo pair (Main, AUX1-3); on Board 1-top (isolated analog domain), controlled via MCP23008 |
+| MCP23008 I2C GPIO expander    | 1        | Board 1-top; controls TS5A3159 mute, codec PDN, headphone detect; address 0x21 |
+| HP amp breakout module (TPA6132/MAX97220) | 1 | Off-the-shelf; ground-referenced stereo HP driver, 25mW/32Ω; on standalone HP Board (isolated analog domain) |
 | RJ45 MagJack (integrated magnetics) | 1 | IO Board; Ethernet connector with integrated transformer + LEDs; top panel |
 | 0.1µF cap (Ethernet coupling) | 1 | IO Board; AC coupling between Teensy PHY and MagJack |
 | 6-pin header (Ethernet ribbon) | 2 | Main Board + IO Board; carries ETH TX/RX differential pairs |
@@ -207,7 +222,10 @@
 
 | Part                           | Quantity | Notes                                    |
 | ------------------------------ | -------- | ---------------------------------------- |
-| ADP7118 LDO                    | 3        | 5V → 3.3V_A ultra-low-noise analog rail; 1 per Input Mother Board (2) + 1 on Main Board (virtual ground; 5V_A also powers HP amp breakout via short wire) |
+| Murata MEJ2S0505SC (isolated DC-DC) | 2  | 5V→5V_ISO isolated DC-DC; 2W (400 mA), 5.2 kV isolation, SIP-7 TH; 1 per FFC on Main Board |
+| Si8662BB-B-IS1 (6-ch digital isolator) | 2 | 150 Mbps, 4 fwd + 2 rev; TDM signal isolation; SOIC-16W; 1 per FFC on Main Board |
+| ISO1541DR (isolated I2C)       | 2        | Bidirectional I2C isolator, 1 MHz, SOIC-8; 1 per FFC on Main Board |
+| ADP7118 LDO                    | 3        | 5V_ISO → 3.3V_A ultra-low-noise analog rail; 1 per Input Mother Board (2) + 1 on Main Board (virtual ground buffer) |
 | 1.0V LDO (AP2112K-1.0 or equiv.) | 1      | XMOS XU216 core supply; on Main Board |
 | 24 MHz crystal                 | 1        | XMOS core clock; on Main Board |
 | 24.576 MHz crystal             | 1        | XMOS audio PLL reference; on Main Board |
@@ -221,7 +239,7 @@
 | ------------------------ | -------- | ------------------------------------------ |
 | 1000-2200 µF electrolytic | 2+       | NeoPixel bulk, power entry                 |
 | 0.1 µF ceramic caps      | 60+      | Local decoupling everywhere (incl. op-amps)|
-| Ferrite beads            | 2-3      | 5V_DIG to LDO input isolation              |
+| Ferrite beads            | 4-5      | Post-isolation filter on each Mother Board (×2) + USB GND + misc |
 | Resistors (300-500 Ω)    | 1        | NeoPixel data series resistor              |
 | Polyfuse (2.5A/5A)       | 1        | USB-C input protection                     |
 | 1N4148 signal diode (key matrix) | 16 | Anti-ghosting diodes for 4×4 key matrix on Key PCB |
@@ -272,11 +290,11 @@ Left zone (Main Board):
 Center:
 - 16× CHOC key switches (4×4 grid): top-aligned with display
 
-Left column (IO Board):
+Left column (IO Board + HP Board):
 - MIDI HOST dual USB-A (stacked)
 - ETH RJ45 (Ethernet)
 - MIDI IN + MIDI OUT (3.5mm TRS Type A)
-- Headphone output (from off-the-shelf HP amp breakout)
+- Headphone output (from standalone HP Board, isolated analog domain)
 - PHONES label + VOL pot
 
 **Back panel (260 × 50 mm — all audio I/O + USB-C + power):**

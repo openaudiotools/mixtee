@@ -37,21 +37,12 @@
 - Post-PHY analog signals -- no impedance-controlled routing required
 - Native Teensy 4.1 Ethernet (DP83825I PHY on board), 10/100 Mbps
 
-## Headphone Amplifier Integration
-
-- Off-the-shelf TPA6132 or MAX97220 breakout module (~$2-5)
-- Ground-referenced output (no AC coupling caps needed on jack)
-- 25 mW into 32-ohm, 0.01% THD+N typical
-- Single 3.3-5V supply (from 5V_A via Main Board)
-- HP_L/HP_R arrive via short wires from Main Board, NOT via FFC
-- Output through 10k-ohm log pot (volume) to headphone TRS jack
-- Headphone detect switch wired to Teensy GPIO pin 39
-
 ## Design Notes
 
-- 2-layer PCB sufficient -- only USB Full-Speed (12 Mbps) and post-PHY Ethernet analog
+- 2-layer PCB sufficient — only USB Full-Speed (12 Mbps) and post-PHY Ethernet analog
 - No high-speed digital traces on this board
-- Functional zones: USB section (top), MIDI section (center), volume/headphone (bottom), FFC/header (interior edge)
+- Headphone amp has been moved to a standalone **HP Board** in the isolated analog domain — see [`../hp/README.md`](../hp/README.md)
+- Functional zones: USB section (top), MIDI section (center), FFC/header (interior edge)
 
 ---
 Back to [README.md](README.md)

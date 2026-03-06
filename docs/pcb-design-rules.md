@@ -84,11 +84,27 @@ Primary: **JLCPCB** or **PCBWay** standard capabilities. All design rules chosen
 
 ## Grounding Strategy
 
-- **Single continuous ground plane** on L2 (4-layer boards) or L2 (2-layer boards)
-- **No hard splits** between analog and digital ground — use single plane with careful return path management
+### Digital Domain (Main Board, IO Board, Key PCB)
+
+- **Single continuous GND plane** on L2 (4-layer) or L2 (2-layer)
 - **Star topology** for high-current returns: USB host VBUS, NeoPixels, TFT backlight returns converge near power entry point
+- **Component placement** enforces separation: power/USB at one end → Teensy/UI center → isolation boundary at opposite end
+
+### Analog Domain (Input Mother Boards, Daughter/Output, HP Board)
+
+- **Single continuous GND_ISO plane** — entirely isolated from digital GND
 - **Short return paths** for audio signals — keep analog traces close to their ground reference
-- **Component placement** enforces separation: power/USB at one end → Teensy/UI center → audio/codec at opposite end
+- All boards in the analog domain have no copper connection to system GND
+
+### Isolation Boundary (Main Board only)
+
+- GND_ISO exists on the Main Board as **small copper islands** around isolator Side 2 output pins and FFC pads
+- **≥1 mm clearance** between GND and GND_ISO copper on all layers (creepage requirement)
+- Place MEJ2S0505SC, Si8662BB, ISO1541 near each FFC connector
+- Keep MEJ2S0505SC (switching DC-DC) physically separated from Si8662BB signal pins
+
+### General
+
 - **Thermal relief** on through-hole pads connected to ground plane (4 spokes, 0.3 mm spoke width)
 
 ------

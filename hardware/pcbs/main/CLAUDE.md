@@ -3,7 +3,7 @@
 ## Required Reading
 - `README.md` — board concept, dimensions, key ICs
 - `connections.md` — all connector interfaces (FFC, JST, USB-C, display, SD)
-- `architecture.md` — soft-latch, power distribution, I2C mux, XMOS XU216 USB audio bridge, pop suppression, pin assignments
+- `architecture.md` — soft-latch, power distribution, I2C mux, XMOS XU216 USB audio bridge, **galvanic isolation** (Si8662BB, ISO1541, MEJ2S0505SC), pin assignments
 - `docs/system-topology.md` — system overview and board summary
 
 ## On Demand

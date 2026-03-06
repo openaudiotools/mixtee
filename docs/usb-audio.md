@@ -26,6 +26,8 @@ MIXTEE uses a dedicated **XMOS XU216** chip as a USB Audio Class 2 bridge, provi
 
 The XMOS runs as a **TDM slave**, passively listening to the existing TDM bus signals. It adds no load to the audio path — the same BCLK, LRCLK, and data lines that connect Teensy to the AK4619VN codecs are simply tapped by high-impedance CMOS inputs on the XMOS.
 
+**Note:** The XMOS tap is on the **digital side** of the galvanic isolation boundary (pre-isolator, on the Main Board). It sees the same TDM signals before they pass through the Si8662BB digital isolators to the analog domain. This is by design — the XMOS is a digital device and belongs in the digital domain.
+
 ```
   AK4619 codecs ←── TDM Bus 1 (SAI1) ──→ Teensy 4.1 ←── TDM Bus 2 (SAI2) ──→ AK4619 codecs
   (inputs 1-8,       BCLK/LRCLK/DATA            │          BCLK/LRCLK/DATA      (inputs 9-16)

@@ -30,6 +30,7 @@ MIXTEE is an open-source 16-input / 8-output digital mixer built around the Teen
 | Input Mother | `hardware/pcbs/input-mother/` | Routed, Gerbers exported |
 | Daughter/Output | `hardware/pcbs/daughter-output/` | Routed, Gerbers exported |
 | Key PCB | `hardware/pcbs/key/` | Routed, Gerbers exported |
+| HP Board | `hardware/pcbs/hp/` | Not started |
 | Power Board | `hardware/pcbs/power/` | Off-the-shelf module |
 
 ## Documentation Loading Guide
@@ -53,15 +54,17 @@ MIXTEE is an open-source 16-input / 8-output digital mixer built around the Teen
 
 ## Architecture at a Glance
 
-**Audio path:** 16 analog inputs → 4× AK4619VN codecs (2 per TDM bus) → Teensy 4.1 DSP → 8 analog outputs
+**Audio path:** 16 analog inputs → 4× AK4619VN codecs (2 per TDM bus) → [galvanic isolation boundary] → Teensy 4.1 DSP → [galvanic isolation boundary] → 8 analog outputs
 
-**I2C bus topology:** Teensy Wire (pins 18/19) → TCA9548A mux (0x70, main board) splits to codec boards; MCP23017 (0x20, Key PCB) sits upstream for key scanning.
+**Galvanic isolation:** Si8662BB digital isolators (TDM), ISO1541 isolated I2C, MEJ2S0505SC isolated DC-DC. Boundary at FFC cables between Main Board and Input Mother Boards. Digital domain (Main, IO, Key) and analog domain (Mother Boards, Daughter/Output, HP Board) share no copper.
 
-**Key hardware ICs:** AK4619VN (codec), XMOS XU216 (USB audio bridge — 24-in/8-out UAC2, main board), TCA9548A (I2C mux), MCP23017 (GPIO expander), FE1.1s (USB hub, IO Board), STUSB4500 (USB PD sink), TPS22965 (load switch). **Off-the-shelf modules:** STUSB4500 breakout (power), TPA6132/MAX97220 breakout (headphone amp), ESP32-S3 integrated display module (UART link to Teensy, runs LVGL).
+**I2C bus topology:** Teensy Wire (pins 18/19) → TCA9548A mux (0x70, main board) → ISO1541 (per channel) → codec boards; MCP23008 (0x21, Board 1-top) controls TS5A3159 mute + codec PDN + headphone detect; MCP23017 (0x20, Key PCB) sits upstream for key scanning.
+
+**Key hardware ICs:** AK4619VN (codec), XMOS XU216 (USB audio bridge — 24-in/8-out UAC2, main board), TCA9548A (I2C mux), Si8662BB-B-IS1 (TDM isolator), ISO1541 (I2C isolator), MEJ2S0505SC (isolated DC-DC), MCP23008 (mute/PDN/HP detect, Board 1-top), MCP23017 (key matrix, Key PCB), FE1.1s (USB hub, IO Board), STUSB4500 (USB PD sink), TPS22965 (load switch). **Off-the-shelf modules:** STUSB4500 breakout (power), TPA6132/MAX97220 breakout (headphone amp, on HP Board), ESP32-S3 integrated display module (UART link to Teensy, runs LVGL).
 
 **Connectivity:** 24-in/8-out USB Audio Class 2 via XMOS XU216 (PC USB-C on main board). Native Ethernet (DP83825I PHY on Teensy) via RJ45 MagJack on IO Board. USB MIDI host via FE1.1s hub (IO Board). MIDI IN/OUT via 3.5mm TRS Type A (IO Board).
 
-**PCB architecture:** 6 unique PCB designs, 10 physical boards + 2 off-the-shelf modules. See `docs/system-topology.md`.
+**PCB architecture:** 7 unique PCB designs, 11 physical boards + 2 off-the-shelf modules. See `docs/system-topology.md`.
 
 ## Key Documentation Cross-References
 
