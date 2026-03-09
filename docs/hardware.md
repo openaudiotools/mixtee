@@ -66,7 +66,7 @@
 
 - **USB host ports:** 2× 500 mA = 1.0 A
 - **NeoPixels (16 keys):** ~320 mA typical (at 30% cap), 960 mA worst-case (uncapped)
-- **ESP32-S3 display module:** Self-powered from 5V_DIG (~250-350 mA including backlight)
+- **ESP32-S3 display PCB:** Self-powered from 5V_DIG (~250-350 mA including backlight)
 - **Teensy + logic:** ~200 mA
 - **Isolated analog domain (via 2× MEJ2S0505SC):** ~400 mA total (2× codecs, op-amps, ADP7118 LDOs, TS5A3159, MCP23008, HP amp)
 - **Worst-case total:** ~2.67 A (with uncapped NeoPixels)
@@ -165,7 +165,7 @@ This eliminates USB ground loops, switching noise, and NeoPixel current spikes f
 
 | Part                          | Quantity | Notes                                        |
 | ----------------------------- | -------- | -------------------------------------------- |
-| ESP32-S3 integrated display module | 1   | 4.3" LCD (e.g., Waveshare ESP32-S3-Touch-LCD-4.3 800×480 or Elecrow CrowPanel 480×272); 6-pin header to Teensy (UART TX/RX + ESP32_EN + GPIO0 + 5V + GND); runs LVGL display engine; Teensy-reflashable from SD card via esp-serial-flasher |
+| Custom display PCB (ESP32-S3-WROOM-1-N16R8 + 4.3" 800×480 LCD) | 1 | Custom PCB with WROOM-1-N16R8 module + bare 40-pin RGB cap-touch LCD panel; 6-pin header to Teensy (UART TX/RX + ESP32_EN + GPIO0 + 5V + GND); runs LVGL display engine; Teensy-reflashable from SD card via esp-serial-flasher; see [Display Rationale](display/rationale.md) |
 | Rotary encoder with push      | 3        | Quadrature, interrupt-capable pins; NavX + NavY + Edit |
 | Custom key PCB                | 1–2     | CHOC hotswap sockets + WS2812B-2020 + MCP23017 + 100nF caps; 4×4 grid |
 | Kailh CHOC hotswap sockets    | 16       | Soldered to custom PCB                        |
@@ -267,7 +267,7 @@ This eliminates USB ground loops, switching noise, and NeoPixel current spikes f
 
 Left zone (Main Board):
 - Full-size SD card slot (left of display, vertically aligned with bottom edge of screen, slot opens upward)
-- 1× ESP32-S3 display module (4.3" integrated LCD; replaces bare TFT + RA8875 controller; physical dimensions depend on chosen module)
+- 1× Custom display PCB (ESP32-S3-WROOM-1-N16R8 + 4.3" 800×480 LCD panel; designed to MIXTEE enclosure dimensions)
 - 3× rotary encoders (NavX + NavY + Edit): horizontal row below display
 
 Center:

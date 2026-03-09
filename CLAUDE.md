@@ -96,9 +96,9 @@ Prefer MCP tools over raw Python/CLI when possible. See `docs/pcbs-workflow.md` 
 
 **I2C bus topology:** Teensy Wire (pins 18/19) → TCA9548A mux (0x70, main board) → ISO1541 (per channel) → codec boards; MCP23008 (0x21, Board 1-top) controls TS5A3159 mute + codec PDN + headphone detect; MCP23017 (0x20, Key PCB) sits upstream for key scanning.
 
-**Key hardware ICs:** AK4619VN (codec), TCA9548A (I2C mux), Si8662BB-B-IS1 (TDM isolator), ISO1541 (I2C isolator), MEJ2S0505SC (isolated DC-DC), MCP23008 (mute/PDN/HP detect, Board 1-top), MCP23017 (key matrix, Key PCB), FE1.1s (USB hub, IO Board), STUSB4500 (USB PD sink), TPS22965 (load switch). **Off-the-shelf modules:** STUSB4500 breakout (power), TPA6132/MAX97220 breakout (headphone amp, on HP Board), ESP32-S3 integrated display module (6-pin header: UART + EN + GPIO0 boot control; runs device-agnostic LVGL display engine).
+**Key hardware ICs:** AK4619VN (codec), TCA9548A (I2C mux), Si8662BB-B-IS1 (TDM isolator), ISO1541 (I2C isolator), MEJ2S0505SC (isolated DC-DC), MCP23008 (mute/PDN/HP detect, Board 1-top), MCP23017 (key matrix, Key PCB), FE1.1s (USB hub, IO Board), STUSB4500 (USB PD sink), TPS22965 (load switch). **Off-the-shelf modules:** STUSB4500 breakout (power), TPA6132/MAX97220 breakout (headphone amp, on HP Board). **Custom PCBs:** ESP32-S3 custom display PCB (WROOM-1-N16R8 + bare 4.3" 800×480 LCD; 6-pin header: UART + EN + GPIO0 boot control; runs device-agnostic LVGL display engine).
 
-**Display engine:** ESP32-S3 is a generic widget renderer — no device-specific knowledge. Teensy loads UI layout from `ui.json` on SD card, streams binary widget commands (COBS-encoded, CRC16) over Serial1 at 921600 baud. Widget types: Container, Label, Meter, Knob, Slider, Bar, Button, Icon, Rect, Page. Touch events forwarded as coordinates. See `docs/display-engine.md`.
+**Display engine:** ESP32-S3 custom display PCB (WROOM-1-N16R8 + bare 4.3" 800×480 LCD) is a generic widget renderer — no device-specific knowledge. Teensy loads UI layout from `ui.json` on SD card, streams binary widget commands (COBS-encoded, CRC16) over Serial1 at 921600 baud. Widget types: Container, Label, Meter, Knob, Slider, Bar, Button, Icon, Rect, Page. Touch events forwarded as coordinates. See `docs/display/protocol.md`.
 
 **SD card update:** Single update mechanism for all firmware (Teensy + ESP32 + UI layout). User copies `/UPDATE/` folder to SD card → power on → auto-update. FlasherX for Teensy self-programming, esp-serial-flasher for ESP32 reflash via UART (pins 9/10 control EN/GPIO0). See `docs/sd-update.md`.
 
@@ -117,7 +117,7 @@ Prefer MCP tools over raw Python/CLI when possible. See `docs/pcbs-workflow.md` 
 | Power budget | `docs/hardware.md` | `hardware/bom.csv`, `docs/enclosure.md` |
 | Connector pinouts | Board `connections.md` files | `docs/system-topology.md` (connector summary) |
 | Board definitions | Board `README.md` files | `docs/system-topology.md` (board summary) |
-| Display protocol | `docs/display-engine.md` | `docs/ui-architecture.md`, `docs/firmware.md` |
+| Display protocol | `docs/display/protocol.md` | `docs/ui-architecture.md`, `docs/firmware.md` |
 | SD card update | `docs/sd-update.md` | `docs/features.md`, `docs/firmware.md` |
 
 ## When Editing Documentation

@@ -44,7 +44,7 @@ graph TB
 
         subgraph PERIPHERALS["Peripherals"]
             direction TB
-            ESP32["ESP32-S3\nDisplay Module\n4.3in LCD - LVGL"]
+            ESP32["ESP32-S3\nCustom Display PCB\nWROOM-1-N16R8\n4.3in 800x480 LCD"]
             ENCODERS["3x Rotary Encoders\nNavX - NavY - Edit"]
             PWR_BTN["Power Button\nmomentary"]
         end

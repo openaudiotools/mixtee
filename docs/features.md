@@ -32,12 +32,12 @@
 
 ### Display
 
-**ESP32-S3 integrated display module** (e.g., Waveshare ESP32-S3-Touch-LCD-4.3 800×480 or Elecrow CrowPanel 480×272)
+**Custom display PCB** with ESP32-S3-WROOM-1-N16R8 + bare 4.3" 800×480 capacitive touch LCD panel. See [Display Rationale](display/rationale.md) for why custom PCB over integrated module.
 
-- Self-contained module: ESP32-S3 MCU + LCD + touch controller on one board
-- Resolution: 800×480 (Waveshare) or 480×272 (Elecrow) — wider aspect ratio suits horizontal channel strip layout
+- Custom PCB: ESP32-S3-WROOM-1-N16R8 (16 MB flash, 8 MB PSRAM) + 40-pin RGB LCD panel + GT911/CST340 touch controller
+- Resolution: 800×480 — wider aspect ratio suits horizontal channel strip layout
 - ESP32-S3 runs a **device-agnostic LVGL display engine** — no device-specific knowledge; reusable across MIXTEE, SYNTEE, and future devices
-- Teensy streams binary widget commands over UART at 921600 baud (COBS-encoded frames with CRC16); see [Display Engine](display-engine.md)
+- Teensy streams binary widget commands over UART at 921600 baud (COBS-encoded frames with CRC16); see [Display Protocol](display/protocol.md)
 - UI layout defined in `ui.json` on SD card — Teensy parses JSON, translates to binary protocol commands, streams to ESP32
 - 6-pin connection: UART TX/RX + ESP32_EN + GPIO0 (bootloader control) + 5V + GND
 - Per-channel strip width: 120 px × display height (mono pair occupies 2 strips)

@@ -76,8 +76,8 @@ See [`../io/connections.md`](../io/connections.md) for the full 12-pin FFC pinou
 | 5 | 5V | — | Module power (5V_DIG) |
 | 6 | GND | — | Common ground |
 
-**Connector:** 6-pin JST-PH (B6B-PH-K-S) or pin header to ESP32-S3 integrated display module.
-**Cable:** ~20mm. Pins 3–4 enable Teensy-controlled ESP32 reflash from SD card — see [SD Update](../../docs/sd-update.md). SPI0 bus no longer needed — display rendering handled entirely by ESP32-S3 module running LVGL.
+**Connector:** 6-pin JST-PH (B6B-PH-K-S) or pin header to custom ESP32-S3 display PCB.
+**Cable:** ~20mm. Pins 3–4 enable Teensy-controlled ESP32 reflash from SD card — see [SD Update](../../docs/sd-update.md). SPI0 bus no longer needed — display rendering handled entirely by ESP32-S3 custom display PCB running LVGL.
 
 ---
 

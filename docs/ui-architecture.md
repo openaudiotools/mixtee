@@ -8,7 +8,7 @@
 
 > **The ESP32-S3 is a device-agnostic LVGL display engine.** It has no knowledge of MIXTEE, channels, or mixing — it only knows how to render widgets. The Teensy is the brain: it reads UI definitions from `ui.json` on the SD card, translates them into binary widget commands, and streams them to the ESP32 over UART. This architecture is reusable across MIXTEE, SYNTEE, and future devices.
 
-> For the binary serial protocol specification, see [Display Engine](display-engine.md). For the SD card update mechanism, see [SD Update](sd-update.md).
+> For the binary serial protocol specification, see [Display Protocol](display/protocol.md). For the SD card update mechanism, see [SD Update](sd-update.md).
 
 The MIXTEE display UI is built on a modular, hierarchical framework designed for two goals: fast access to the most-used mixing parameters (gain, level, mute) with minimal button presses, and extensibility so that community contributors can add new processing modules without reworking the navigation engine.
 

@@ -1,6 +1,6 @@
 # MIXTEE: Display Engine Protocol
 
-*← Back to [README](../README.md) | See also: [UI Architecture](ui-architecture.md) · [Firmware](firmware.md) · [SD Update](sd-update.md)*
+*← Back to [README](../../README.md) | See also: [UI Architecture](../ui-architecture.md) · [Firmware](../firmware.md) · [SD Update](../sd-update.md) · [Display Rationale](rationale.md)*
 
 ------
 

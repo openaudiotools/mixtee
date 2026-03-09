@@ -17,7 +17,7 @@
 - **Audio:** PJRC Audio Library (AudioInputTDM, AudioOutputTDM, AudioMixer4)
 - **Encoders:** PJRC Encoder Library (quadrature decoding)
 - **Buttons:** PJRC Bounce Library (debouncing)
-- **Display:** Offloaded to ESP32-S3 integrated display module (LVGL display engine); Teensy streams binary widget commands over Serial1 UART (pins 0/1) at 921600 baud; see [Display Engine](display-engine.md)
+- **Display:** Offloaded to ESP32-S3 custom display PCB (LVGL display engine); Teensy streams binary widget commands over Serial1 UART (pins 0/1) at 921600 baud; see [Display Protocol](display/protocol.md)
 - **NeoPixels:** Adafruit NeoPixel or FastLED (level-shifted data output)
 - **Network Audio:** AES67 over Ethernet (16-in / 8-out to DAW); see [network-connectivity.md](network-connectivity.md) §9
 - **MIDI:** USBHost_t36 (Teensy USB Host library)
@@ -95,7 +95,7 @@ Profile with `AudioProcessorUsage` and `AudioProcessorUsageMax` during Phase 1 b
 
 The PJRC Audio Library runs on a timer interrupt and preempts all other code. The firmware must be structured so that no non-audio task holds shared resources (memory) long enough to cause audio buffer underruns. Key considerations:
 
-- **Display communication** is handled via Serial1 UART (pins 0/1) to the ESP32-S3 display engine at 921600 baud — lightweight, non-blocking, DMA-capable. No SPI bus contention with display rendering. The Teensy streams binary widget commands (COBS-encoded frames with CRC16); the ESP32-S3 is a generic LVGL rendering engine with no device-specific knowledge. See [Display Engine](display-engine.md) for protocol details.
+- **Display communication** is handled via Serial1 UART (pins 0/1) to the ESP32-S3 display engine at 921600 baud — lightweight, non-blocking, DMA-capable. No SPI bus contention with display rendering. The Teensy streams binary widget commands (COBS-encoded frames with CRC16); the ESP32-S3 is a generic LVGL rendering engine with no device-specific knowledge. See [Display Protocol](display/protocol.md) for protocol details.
 - **SD card writes** use SDIO DMA and run from the main loop at lowest priority. The PSRAM ring buffer decouples recording from real-time audio.
 - **NeoPixel updates** are fast (8 pixels, microseconds) and non-blocking.
 - **MIDI parsing** is event-driven via USBHost_t36 callbacks (for USB MIDI controllers) — lightweight and non-blocking. The MIDI handler resolves `MIDI channel → channel group` (Ch 1: inputs 1–8, Ch 2: inputs 9–16, Ch 3: outputs), then `CC number → parameter + channel offset`. Uniform parsing, no special cases per group.

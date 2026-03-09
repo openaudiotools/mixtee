@@ -1,6 +1,6 @@
 # MIXTEE: SD Card Update Mechanism
 
-*← Back to [README](../README.md) | See also: [Firmware](firmware.md) · [Display Engine](display-engine.md) · [Features](features.md)*
+*← Back to [README](../README.md) | See also: [Firmware](firmware.md) · [Display Protocol](display/protocol.md) · [Features](features.md)*
 
 ------
 
@@ -228,7 +228,7 @@ If `/UPDATE/manifest.json` is not found, MIXTEE boots normally in <3 seconds. No
 
 | Risk | Mitigation |
 |------|-----------|
-| ESP32 module doesn't expose EN/GPIO0 | Verify pin accessibility before committing to a module (Waveshare 4.3" does expose these) |
+| ESP32 EN/GPIO0 inaccessible | Custom display PCB guarantees direct access to EN and GPIO0 — not dependent on third-party module pinout |
 | Power loss during FlasherX | Upper-flash-first write order + HalfKay ROM = always recoverable via USB |
 | ESP32 reflash takes too long | 921600 baud after SYNC (~16s for 1.5 MB); NeoPixel progress indicator |
 | Wrong update package for device | `device` field in manifest.json must match EEPROM; prevents cross-device flashing |
