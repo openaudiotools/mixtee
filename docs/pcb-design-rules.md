@@ -125,7 +125,7 @@ For QFN packages (AK4619VN QFN-32, STUSB4500 QFN-24):
 - **Minimum line width:** 0.15 mm (6 mil)
 - **Minimum text height:** 1.0 mm
 - **Reference designators:** On all components
-- **Board markings:** Board name, revision, date, CERN-OHL-P v2 notice, openmusictools.com
+- **Board markings:** Board name, revision, date, CERN-OHL-P v2 notice, openaudiotools.com
 - **Polarity indicators:** On all polarized components (diodes, electrolytic caps, ICs)
 - **Pin 1 markers:** On all ICs
 

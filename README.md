@@ -83,4 +83,4 @@ Each board under `hardware/pcbs/` has its own `README.md` (concept), `connection
 
 MIXTEE is fully open source. Hardware is licensed under CERN-OHL-P v2 (permissive), firmware under MIT, and documentation under CC BY 4.0. See [LICENSE](LICENSE) for details.
 
-**Author:** Juliusz Fedyk — [openmusictools.com](https://openmusictools.com)
+**Author:** Juliusz Fedyk — [openaudiotools.com](https://openaudiotools.com)
